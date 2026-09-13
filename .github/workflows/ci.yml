@@ -93,7 +93,7 @@ jobs:
       # Reporting only - `if: always()` so a failed run still yields the HTML report to look at.
       - name: Upload the coverage report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-jdk${{ matrix.java-version }}
           path: target/site/jacoco/
