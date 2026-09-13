@@ -43,11 +43,7 @@ ONDEWO_NLU_VERSION=7.1.0
 # every `make build` runs first, so a build can never silently use whatever the submodule
 # happened to be left at.
 ONDEWO_NLU_API_GIT_BRANCH=tags/7.1.0
-# PROVISIONAL PIN. The six compiled-language targets this client depends on landed on the
-# branch below; ondewo-proto-compiler 5.15.0 is not tagged yet. Once that release is cut this
-# becomes tags/5.15.0 - `make release_update_proto_compiler_dependency_<lang>` in the compiler
-# repo rewrites it, so do not hand-edit it then.
-ONDEWO_PROTO_COMPILER_GIT_BRANCH=feature/rust-php-go-cpp-java-csharp
+ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.0
 
 # You need to setup an access token at https://github.com/settings/tokens - permissions are important
 GITHUB_GH_TOKEN?=ENTER_YOUR_TOKEN_HERE
