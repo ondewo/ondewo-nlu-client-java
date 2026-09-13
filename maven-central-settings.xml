@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Maven settings used ONLY by the Maven Central publishing step (`mvn -s maven-central-settings.xml`).
+
+  It contains NO credential: `${env.X}` is interpolated by maven at run time, so the token
+  lives exclusively in the process environment - fed by the ondewo-devops-accounts
+  `account_maven_central.env` locally and by GitHub Actions secrets in CI. That is the same
+  indirection actions/setup-java generates, written down here so the Makefile and the workflow
+  use one identical file.
+
+  `central` is the <publishingServerId> the central-publishing-maven-plugin looks up in the
+  pom's `release` profile. Username and password are the two halves of a Central Portal USER
+  TOKEN (https://central.sonatype.com/account), never the portal login itself.
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>central</id>
+      <username>${env.MAVEN_CENTRAL_USERNAME}</username>
+      <password>${env.MAVEN_CENTRAL_PASSWORD}</password>
+    </server>
+  </servers>
+</settings>

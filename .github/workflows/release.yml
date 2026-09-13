@@ -1,0 +1,108 @@
+name: release
+
+# Publishes com.ondewo:ondewo-nlu-client-java to Maven Central through the Sonatype Central
+# Portal.
+#
+# There are deliberately TWO routes to that upload and they do the same thing:
+#   * this workflow, driven by the version tag, with the credentials as GitHub secrets, and
+#   * `make push_to_maven_central_via_docker`, driven from a maintainer's machine, with the
+#     credentials read out of ondewo-devops-accounts/account_maven_central.env.
+# Use ONE per release. Both leave the deployment VALIDATED but UNPUBLISHED in the Portal
+# (autoPublish=false in the pom's `release` profile), so nothing becomes public until a human
+# presses Publish at https://central.sonatype.com/publishing/deployments - which is also what
+# makes a duplicate upload visible and harmless instead of dangerous.
+#
+# Nothing in this workflow is conditional or best-effort: a missing secret, a tag that does not
+# match the pom, or a pom Maven Central would reject fails the run. A green run means the
+# deployment really is in the Portal.
+
+on:
+  push:
+    # Exactly the tag shape `make create_release_tag` pushes: a bare semver, no leading "v".
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: read
+
+# Never let two uploads of the same tag race each other.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: publish to Maven Central
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # FIRST, before the build: without the credentials there is nothing this workflow can
+      # do, and a run that reports success while having published nothing is worse than a red
+      # one. All four are reported at once, by name, so the fix is a single visit to the
+      # repository settings.
+      - name: Assert the publishing secrets are present
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_KEY_B64: ${{ secrets.MAVEN_GPG_KEY_B64 }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          missing=""
+          for name in MAVEN_CENTRAL_USERNAME MAVEN_CENTRAL_PASSWORD MAVEN_GPG_KEY_B64 MAVEN_GPG_PASSPHRASE; do
+            eval "value=\${$name:-}"
+            case "$value" in "" | ENTER_HERE_YOUR_*) missing="$missing $name" ;; esac
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::no repository secret for:$missing - add them under Settings > Secrets and variables > Actions (see README.md, 'Publishing to Maven Central'), then re-run this workflow"
+            exit 1
+          fi
+          echo "all four publishing secrets are set"
+
+      # The tag is what consumers will resolve; the pom is what actually gets uploaded. A
+      # mismatch means somebody tagged without running `make build`, and the artifact would
+      # carry a version nobody asked for.
+      - name: Assert the tag matches the pom version
+        run: |
+          set -euo pipefail
+          pom_version=$(sed -n 's|.*<version>\(.*\)</version>.*|\1|p' pom.xml | head -n 1)
+          if [ "$GITHUB_REF_NAME" != "$pom_version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match the pom version $pom_version - bump ONDEWO_NLU_VERSION, run 'make build' and re-tag"
+            exit 1
+          fi
+          echo "publishing com.ondewo:ondewo-nlu-client-java:$pom_version"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      # The same lint the dry run in ci.yml runs, repeated here because the Portal only
+      # validates the pom AFTER the whole bundle has been uploaded.
+      - name: Check the pom against the Central Portal requirements
+        run: make check_central_pom
+
+      # `make publish_to_maven_central` = mvn -s maven-central-settings.xml -Prelease clean
+      # deploy. The Makefile's `?=` defaults are placeholders, so these env vars win; the
+      # recipe decodes MAVEN_GPG_KEY_B64 into MAVEN_GPG_KEY in the process environment only,
+      # and is @-prefixed so no value is echoed.
+      - name: Build, sign and upload the deployment
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_KEY_B64: ${{ secrets.MAVEN_GPG_KEY_B64 }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: make publish_to_maven_central
+
+      - name: Say what still needs a human
+        run: |
+          {
+            echo "### Uploaded com.ondewo:ondewo-nlu-client-java:${GITHUB_REF_NAME}"
+            echo ""
+            echo "The deployment is validated but **not public yet**."
+            echo "Open <https://central.sonatype.com/publishing/deployments> and press **Publish**."
+            echo ""
+            echo "Releasing to Maven Central is irreversible: a published version can never be replaced or withdrawn."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -42,12 +42,37 @@ the repository can be consumed and opened in an IDE without Docker.
 
 ## Installation
 
-The library is not published to Maven Central. Pick whichever of the following fits your build.
+### Maven Central
+
+The published coordinates are `com.ondewo:ondewo-nlu-client-java`. Maven:
+
+```xml
+<dependency>
+  <groupId>com.ondewo</groupId>
+  <artifactId>ondewo-nlu-client-java</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+Gradle:
+
+```groovy
+dependencies { implementation 'com.ondewo:ondewo-nlu-client-java:VERSION' }
+```
+
+No `<repositories>` block is needed - Maven Central is the default repository of both build
+tools. Every published version ships the binary jar, a sources jar and a javadoc jar, each with
+a detached PGP signature, so an IDE resolves sources and docs automatically.
+
+> Which versions are on Maven Central is listed at
+> [search.maven.org](https://search.maven.org/artifact/com.ondewo/ondewo-nlu-client-java).
+> Versions released before the namespace was verified are only available through the two
+> fallbacks below.
 
 ### JitPack
 
-[JitPack](https://jitpack.io) builds this repository straight from its git tag, so no extra
-infrastructure is needed:
+[JitPack](https://jitpack.io) builds this repository straight from its git tag, so it works for
+every tag, including ones that predate the Maven Central release:
 
 ```xml
 <repositories>
@@ -156,6 +181,7 @@ class protoc names after the proto file (`entity_type.proto` → `EntityTypeProt
 ├── pom.xml                   <----- generated build descriptor (committed)
 ├── target/                   <----- build output (git-ignored)
 ├── Makefile                  <----- every workflow: build, test, release
+├── maven-central-settings.xml <---- publishing settings; holds env references, no credential
 ├── RELEASE.md
 └── README.md
 ```
@@ -259,12 +285,71 @@ the next `make build`.
 1. Bump `ONDEWO_NLU_VERSION` and the submodule pins in the `Makefile`.
 1. Add the release entry at the top of `RELEASE.md`.
 1. `make ondewo_release` — checks that the branch/tag/pom version are consistent (`spc`), fetches
-   the GitHub credentials from the `ondewo-devops-accounts` repository, rebuilds everything,
-   commits, creates the release branch and tag, and publishes the GitHub release with the built
-   jars attached.
+   the GitHub and Maven Central credentials from the `ondewo-devops-accounts` repository,
+   rebuilds everything, commits, creates the release branch and tag, publishes the GitHub
+   release with the built jars attached, and uploads the signed deployment to Maven Central.
 
 `make release` does the same with credentials taken from the environment
-(`GITHUB_GH_TOKEN=... make release`).
+(`GITHUB_GH_TOKEN=... MAVEN_CENTRAL_USERNAME=... make release`).
+
+## Publishing to Maven Central
+
+The artifact is published to Maven Central through the
+[Sonatype Central Portal](https://central.sonatype.com). Every deployment is uploaded with
+`autoPublish=false`: it is validated and then **waits in the Portal for a human to press
+Publish**. That last step is deliberate, because a published version can never be replaced or
+withdrawn.
+
+### What is checked, and when
+
+| When | What |
+| --- | --- |
+| Every push (CI) | `make dry_run_maven_central` — builds with the `release` profile, signs everything with a throwaway key, verifies the signatures, and re-runs the whole build with maven offline. Needs no credential. |
+| Before an upload | `make check_central_pom` — the pom carries every field the Portal validates; `make check_maven_central_credentials` — no credential is still a placeholder. |
+| The upload | `make push_to_maven_central_via_docker` (from a maintainer's machine, credentials from `ondewo-devops-accounts`) **or** `.github/workflows/release.yml` (triggered by the version tag, credentials from the repository's Actions secrets). They are alternatives; use one per release. |
+
+### Credentials
+
+Four secrets, stored **twice**: in `ondewo-devops-accounts/account_maven_central.env` for the
+`make` route and as GitHub Actions secrets of this repository for the workflow route. The names
+are identical in both places, and the `Makefile` declares them with `ENTER_HERE_YOUR_...`
+placeholders so an unconfigured machine fails loudly instead of publishing.
+
+| Name | What it is | How to obtain it |
+| --- | --- | --- |
+| `MAVEN_CENTRAL_USERNAME` | Username half of a Central Portal **user token** — not the portal login. | [central.sonatype.com/account](https://central.sonatype.com/account) → *Generate User Token*. |
+| `MAVEN_CENTRAL_PASSWORD` | Password half of that same user token. | Same dialog; it is shown once. |
+| `MAVEN_GPG_KEY_B64` | The PGP **secret** key that signs the artifacts, base64 on a single line. | `gpg --armor --export-secret-keys <fingerprint> \| base64 -w0` |
+| `MAVEN_GPG_PASSPHRASE` | Passphrase of that key. | Chosen when the key is created. |
+
+`MAVEN_GPG_KEY_B64` is base64-encoded because both carriers are strictly one line per variable:
+an `account_*.env` line, and the `make release VAR=...` hand-off in `run_release_with_devops`. It
+is decoded into `MAVEN_GPG_KEY` in the process environment immediately before maven starts and
+is never written to disk. The `bc` signer of `maven-gpg-plugin` reads it from there, so no
+keyring, `gpg` binary or `gpg-agent` has to exist in the runner or the publishing container.
+
+### One-time setup (a human, once)
+
+1. **Own the namespace.** `com.ondewo` is the reverse of `ondewo.com`, so it is ONDEWO's to
+   claim. Add the namespace at
+   [central.sonatype.com/publishing/namespaces](https://central.sonatype.com/publishing/namespaces)
+   and complete the DNS proof: the Portal hands out a verification code that has to appear as a
+   `TXT` record on `ondewo.com`. Until the namespace shows *Verified*, every upload is rejected.
+2. **Create the signing key** (4096-bit RSA, with a passphrase), publish its public half to a
+   keyserver Central checks, and note its fingerprint:
+
+   ```bash
+   gpg --full-generate-key
+   gpg --list-secret-keys --keyid-format=long
+   gpg --keyserver keyserver.ubuntu.com --send-keys <fingerprint>
+   ```
+
+   Central verifies the signature against the public key, so a key that is not on a keyserver
+   fails validation even though the upload itself succeeded.
+3. **Generate the user token** and store all four values in
+   `ondewo-devops-accounts/account_maven_central.env`.
+4. **Add the same four values** as repository secrets under
+   *Settings → Secrets and variables → Actions*.
 
 ## Contributing
 

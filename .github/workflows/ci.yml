@@ -98,3 +98,37 @@ jobs:
           name: jacoco-jdk${{ matrix.java-version }}
           path: target/site/jacoco/
           if-no-files-found: warn
+
+  publish-dry-run:
+    name: maven central dry run
+    runs-on: ubuntu-latest
+    # The packaging path a RELEASE takes, exercised on every push with no credential at all.
+    # `make dry_run_maven_central` builds with the `release` profile, signs every artifact with
+    # a throwaway key it generates on the spot, and verifies the signatures - so a pom that
+    # Maven Central would reject, a javadoc jar that stopped building or a broken signing
+    # configuration turns THIS job red, months before somebody cuts a release.
+    # It can never publish: the central-publishing goal is bound to `deploy`, and this stops
+    # at `verify`.
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Rehearse the Maven Central deployment
+        run: make dry_run_maven_central
+
+      - name: List the deployment bundle
+        run: |
+          set -euo pipefail
+          {
+            echo "### Maven Central deployment bundle (dry run)"
+            echo ""
+            echo "| file | bytes |"
+            echo "| --- | --- |"
+            find target -maxdepth 1 -type f \( -name '*.jar' -o -name '*.asc' \) \
+              -exec ls -l {} \; | awk '{ printf "| %s | %s |\n", $NF, $5 }' | sort
+          } >> "$GITHUB_STEP_SUMMARY"
