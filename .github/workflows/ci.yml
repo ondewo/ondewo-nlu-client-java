@@ -1,0 +1,71 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  lint:
+    name: pre-commit (markdown + hygiene)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      # markdownlint-cli2 runs with `fix: true`, so an unformatted file shows up as a diff here
+      # instead of being silently rewritten on somebody's laptop.
+      - name: Run the language-agnostic hooks
+        run: pre-commit run --all-files --show-diff-on-failure
+
+  build:
+    name: build + test (JDK ${{ matrix.java-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 11 is the bytecode floor the generated pom compiles against, 21 the JDK the compiler
+        # image itself ships - the jar has to build on both.
+        java-version: ["11", "21"]
+    steps:
+      # The api submodule is needed by `make check_build`, which matches every .proto against
+      # the java code generated for it.
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java-version }}
+          cache: maven
+
+      # A freshly instantiated repository has no generated client yet: warn loudly and skip the
+      # java steps rather than failing with maven's opaque "there is no POM in this directory".
+      - name: Check that the generated client is committed
+        id: generated
+        run: |
+          if [ -f pom.xml ] && [ -d src/main/java ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No generated client found (pom.xml / src/main/java) - run 'make build' and commit the result."
+          fi
+
+      - name: Verify that every proto produced java code
+        if: steps.generated.outputs.present == 'true'
+        run: make check_build
+
+      - name: Package the jar
+        if: steps.generated.outputs.present == 'true'
+        run: mvn -B --no-transfer-progress -DskipTests package
+
+      - name: Run the test suite
+        if: steps.generated.outputs.present == 'true'
+        run: mvn -B --no-transfer-progress test

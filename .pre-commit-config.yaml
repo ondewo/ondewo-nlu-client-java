@@ -1,0 +1,54 @@
+#############################################################################################
+# pre-commit - language-agnostic hooks for ondewo-nlu-client-java.                                     #
+# Java formatting/linting is NOT wired in here: everything under src/main/java is generated  #
+# by the ondewo-java-proto-compiler image, and reformatting generated code would fight the   #
+# generator on every regeneration. Compilation is the gate that matters and it runs in CI    #
+# (`mvn package`) and via `make test`.                                                       #
+# see https://pre-commit.com/#intro for an introduction to pre-commit                        #
+#############################################################################################
+
+# Never touch generated code or build output. src/main/java holds the protoc output (plus the
+# few hand-written classes that live in their own package - they are covered by the java
+# toolchain, not by these text hooks); target/ and build/ are build output.
+exclude: '^src/main/java/|(^|/)(target|build|\.gradle|\.m2)/'
+
+fail_fast: false
+# "fail_fast: false" means pre-commit continues to run hooks after the first failure
+
+repos:
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.0
+    hooks:
+      - id: markdownlint-cli2
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # 5 MB, not the usual 1 MB: protoc emits one outer class per .proto and these protos do
+      # not set java_multiple_files, so a single generated .java is routinely several hundred KB.
+      - id: check-added-large-files
+        args: [ --maxkb=5120 ]
+      - id: check-json
+      - id: check-yaml
+      - id: check-xml          # validates the generated pom.xml (does NOT reformat it)
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: detect-private-key
+      - id: check-executables-have-shebangs
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+  - repo: https://github.com/milin/giticket
+    rev: '1.92'
+    hooks:
+      - id: giticket
+        args: [ '--regex=(?:(?:feature|bugfix|support|hotfix)/)?(OND[0-9]{3}-[0-9]{1,5})[_-][\w-]+',
+                '--format=[{ticket}] {commit_msg}',
+                '--mode=regex_match' ]
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [ commit-msg ]
