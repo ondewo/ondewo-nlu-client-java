@@ -16,9 +16,9 @@ jobs:
     name: pre-commit (markdown + hygiene)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -42,9 +42,9 @@ jobs:
     steps:
       # No `submodules:` - the stubs are committed, so neither ondewo-nlu-api nor
       # ondewo-proto-compiler is needed to compile and test them.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
@@ -93,7 +93,7 @@ jobs:
       # Reporting only - `if: always()` so a failed run still yields the HTML report to look at.
       - name: Upload the coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jacoco-jdk${{ matrix.java-version }}
           path: target/site/jacoco/
