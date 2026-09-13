@@ -2,7 +2,7 @@
 
 *****************
 
-## Release ONDEWO NLU Java Client 0.1.0
+## Release ONDEWO NLU Java Client 7.1.0
 
 ### New Features
 
