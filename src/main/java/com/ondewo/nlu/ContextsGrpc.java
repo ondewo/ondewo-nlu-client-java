@@ -1,0 +1,866 @@
+package com.ondewo.nlu;
+
+import static io.grpc.MethodDescriptor.generateFullMethodName;
+
+/**
+ * <pre>
+ * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+ * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+ * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+ * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+ * </pre>
+ */
+@io.grpc.stub.annotations.GrpcGenerated
+public final class ContextsGrpc {
+
+  private ContextsGrpc() {}
+
+  public static final java.lang.String SERVICE_NAME = "ondewo.nlu.Contexts";
+
+  // Static method descriptors that strictly reflect the proto.
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.ListContextsRequest,
+      com.ondewo.nlu.ListContextsResponse> getListContextsMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "ListContexts",
+      requestType = com.ondewo.nlu.ListContextsRequest.class,
+      responseType = com.ondewo.nlu.ListContextsResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.ListContextsRequest,
+      com.ondewo.nlu.ListContextsResponse> getListContextsMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.ListContextsRequest, com.ondewo.nlu.ListContextsResponse> getListContextsMethod;
+    if ((getListContextsMethod = ContextsGrpc.getListContextsMethod) == null) {
+      synchronized (ContextsGrpc.class) {
+        if ((getListContextsMethod = ContextsGrpc.getListContextsMethod) == null) {
+          ContextsGrpc.getListContextsMethod = getListContextsMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.ListContextsRequest, com.ondewo.nlu.ListContextsResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "ListContexts"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.ListContextsRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.ListContextsResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new ContextsMethodDescriptorSupplier("ListContexts"))
+              .build();
+        }
+      }
+    }
+    return getListContextsMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.GetContextRequest,
+      com.ondewo.nlu.Context> getGetContextMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "GetContext",
+      requestType = com.ondewo.nlu.GetContextRequest.class,
+      responseType = com.ondewo.nlu.Context.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.GetContextRequest,
+      com.ondewo.nlu.Context> getGetContextMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.GetContextRequest, com.ondewo.nlu.Context> getGetContextMethod;
+    if ((getGetContextMethod = ContextsGrpc.getGetContextMethod) == null) {
+      synchronized (ContextsGrpc.class) {
+        if ((getGetContextMethod = ContextsGrpc.getGetContextMethod) == null) {
+          ContextsGrpc.getGetContextMethod = getGetContextMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.GetContextRequest, com.ondewo.nlu.Context>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "GetContext"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.GetContextRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.Context.getDefaultInstance()))
+              .setSchemaDescriptor(new ContextsMethodDescriptorSupplier("GetContext"))
+              .build();
+        }
+      }
+    }
+    return getGetContextMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.CreateContextRequest,
+      com.ondewo.nlu.Context> getCreateContextMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "CreateContext",
+      requestType = com.ondewo.nlu.CreateContextRequest.class,
+      responseType = com.ondewo.nlu.Context.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.CreateContextRequest,
+      com.ondewo.nlu.Context> getCreateContextMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.CreateContextRequest, com.ondewo.nlu.Context> getCreateContextMethod;
+    if ((getCreateContextMethod = ContextsGrpc.getCreateContextMethod) == null) {
+      synchronized (ContextsGrpc.class) {
+        if ((getCreateContextMethod = ContextsGrpc.getCreateContextMethod) == null) {
+          ContextsGrpc.getCreateContextMethod = getCreateContextMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.CreateContextRequest, com.ondewo.nlu.Context>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CreateContext"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.CreateContextRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.Context.getDefaultInstance()))
+              .setSchemaDescriptor(new ContextsMethodDescriptorSupplier("CreateContext"))
+              .build();
+        }
+      }
+    }
+    return getCreateContextMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.UpdateContextRequest,
+      com.ondewo.nlu.Context> getUpdateContextMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "UpdateContext",
+      requestType = com.ondewo.nlu.UpdateContextRequest.class,
+      responseType = com.ondewo.nlu.Context.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.UpdateContextRequest,
+      com.ondewo.nlu.Context> getUpdateContextMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.UpdateContextRequest, com.ondewo.nlu.Context> getUpdateContextMethod;
+    if ((getUpdateContextMethod = ContextsGrpc.getUpdateContextMethod) == null) {
+      synchronized (ContextsGrpc.class) {
+        if ((getUpdateContextMethod = ContextsGrpc.getUpdateContextMethod) == null) {
+          ContextsGrpc.getUpdateContextMethod = getUpdateContextMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.UpdateContextRequest, com.ondewo.nlu.Context>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "UpdateContext"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.UpdateContextRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.Context.getDefaultInstance()))
+              .setSchemaDescriptor(new ContextsMethodDescriptorSupplier("UpdateContext"))
+              .build();
+        }
+      }
+    }
+    return getUpdateContextMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.DeleteContextRequest,
+      com.google.protobuf.Empty> getDeleteContextMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "DeleteContext",
+      requestType = com.ondewo.nlu.DeleteContextRequest.class,
+      responseType = com.google.protobuf.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.DeleteContextRequest,
+      com.google.protobuf.Empty> getDeleteContextMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.DeleteContextRequest, com.google.protobuf.Empty> getDeleteContextMethod;
+    if ((getDeleteContextMethod = ContextsGrpc.getDeleteContextMethod) == null) {
+      synchronized (ContextsGrpc.class) {
+        if ((getDeleteContextMethod = ContextsGrpc.getDeleteContextMethod) == null) {
+          ContextsGrpc.getDeleteContextMethod = getDeleteContextMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.DeleteContextRequest, com.google.protobuf.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "DeleteContext"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.DeleteContextRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new ContextsMethodDescriptorSupplier("DeleteContext"))
+              .build();
+        }
+      }
+    }
+    return getDeleteContextMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.DeleteAllContextsRequest,
+      com.google.protobuf.Empty> getDeleteAllContextsMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "DeleteAllContexts",
+      requestType = com.ondewo.nlu.DeleteAllContextsRequest.class,
+      responseType = com.google.protobuf.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.DeleteAllContextsRequest,
+      com.google.protobuf.Empty> getDeleteAllContextsMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.DeleteAllContextsRequest, com.google.protobuf.Empty> getDeleteAllContextsMethod;
+    if ((getDeleteAllContextsMethod = ContextsGrpc.getDeleteAllContextsMethod) == null) {
+      synchronized (ContextsGrpc.class) {
+        if ((getDeleteAllContextsMethod = ContextsGrpc.getDeleteAllContextsMethod) == null) {
+          ContextsGrpc.getDeleteAllContextsMethod = getDeleteAllContextsMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.DeleteAllContextsRequest, com.google.protobuf.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "DeleteAllContexts"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.DeleteAllContextsRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+              .setSchemaDescriptor(new ContextsMethodDescriptorSupplier("DeleteAllContexts"))
+              .build();
+        }
+      }
+    }
+    return getDeleteAllContextsMethod;
+  }
+
+  /**
+   * Creates a new async stub that supports all call types for the service
+   */
+  public static ContextsStub newStub(io.grpc.Channel channel) {
+    io.grpc.stub.AbstractStub.StubFactory<ContextsStub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<ContextsStub>() {
+        @java.lang.Override
+        public ContextsStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new ContextsStub(channel, callOptions);
+        }
+      };
+    return ContextsStub.newStub(factory, channel);
+  }
+
+  /**
+   * Creates a new blocking-style stub that supports all types of calls on the service
+   */
+  public static ContextsBlockingV2Stub newBlockingV2Stub(
+      io.grpc.Channel channel) {
+    io.grpc.stub.AbstractStub.StubFactory<ContextsBlockingV2Stub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<ContextsBlockingV2Stub>() {
+        @java.lang.Override
+        public ContextsBlockingV2Stub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new ContextsBlockingV2Stub(channel, callOptions);
+        }
+      };
+    return ContextsBlockingV2Stub.newStub(factory, channel);
+  }
+
+  /**
+   * Creates a new blocking-style stub that supports unary and streaming output calls on the service
+   */
+  public static ContextsBlockingStub newBlockingStub(
+      io.grpc.Channel channel) {
+    io.grpc.stub.AbstractStub.StubFactory<ContextsBlockingStub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<ContextsBlockingStub>() {
+        @java.lang.Override
+        public ContextsBlockingStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new ContextsBlockingStub(channel, callOptions);
+        }
+      };
+    return ContextsBlockingStub.newStub(factory, channel);
+  }
+
+  /**
+   * Creates a new ListenableFuture-style stub that supports unary calls on the service
+   */
+  public static ContextsFutureStub newFutureStub(
+      io.grpc.Channel channel) {
+    io.grpc.stub.AbstractStub.StubFactory<ContextsFutureStub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<ContextsFutureStub>() {
+        @java.lang.Override
+        public ContextsFutureStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new ContextsFutureStub(channel, callOptions);
+        }
+      };
+    return ContextsFutureStub.newStub(factory, channel);
+  }
+
+  /**
+   * <pre>
+   * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+   * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+   * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+   * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+   * </pre>
+   */
+  public interface AsyncService {
+
+    /**
+     * <pre>
+     * Returns the list of all contexts in the specified session.
+     * </pre>
+     */
+    default void listContexts(com.ondewo.nlu.ListContextsRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.ListContextsResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getListContextsMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Retrieves the specified context.
+     * </pre>
+     */
+    default void getContext(com.ondewo.nlu.GetContextRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.Context> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetContextMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Creates a context.
+     * </pre>
+     */
+    default void createContext(com.ondewo.nlu.CreateContextRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.Context> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCreateContextMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Updates the specified context.
+     * </pre>
+     */
+    default void updateContext(com.ondewo.nlu.UpdateContextRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.Context> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getUpdateContextMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Deletes the specified context.
+     * </pre>
+     */
+    default void deleteContext(com.ondewo.nlu.DeleteContextRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getDeleteContextMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Deletes all active contexts in the specified session.
+     * </pre>
+     */
+    default void deleteAllContexts(com.ondewo.nlu.DeleteAllContextsRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getDeleteAllContextsMethod(), responseObserver);
+    }
+  }
+
+  /**
+   * Base class for the server implementation of the service Contexts.
+   * <pre>
+   * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+   * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+   * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+   * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+   * </pre>
+   */
+  public static abstract class ContextsImplBase
+      implements io.grpc.BindableService, AsyncService {
+
+    @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
+      return ContextsGrpc.bindService(this);
+    }
+  }
+
+  /**
+   * A stub to allow clients to do asynchronous rpc calls to service Contexts.
+   * <pre>
+   * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+   * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+   * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+   * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+   * </pre>
+   */
+  public static final class ContextsStub
+      extends io.grpc.stub.AbstractAsyncStub<ContextsStub> {
+    private ContextsStub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      super(channel, callOptions);
+    }
+
+    @java.lang.Override
+    protected ContextsStub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      return new ContextsStub(channel, callOptions);
+    }
+
+    /**
+     * <pre>
+     * Returns the list of all contexts in the specified session.
+     * </pre>
+     */
+    public void listContexts(com.ondewo.nlu.ListContextsRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.ListContextsResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getListContextsMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Retrieves the specified context.
+     * </pre>
+     */
+    public void getContext(com.ondewo.nlu.GetContextRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.Context> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getGetContextMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Creates a context.
+     * </pre>
+     */
+    public void createContext(com.ondewo.nlu.CreateContextRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.Context> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getCreateContextMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Updates the specified context.
+     * </pre>
+     */
+    public void updateContext(com.ondewo.nlu.UpdateContextRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.Context> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getUpdateContextMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Deletes the specified context.
+     * </pre>
+     */
+    public void deleteContext(com.ondewo.nlu.DeleteContextRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getDeleteContextMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Deletes all active contexts in the specified session.
+     * </pre>
+     */
+    public void deleteAllContexts(com.ondewo.nlu.DeleteAllContextsRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getDeleteAllContextsMethod(), getCallOptions()), request, responseObserver);
+    }
+  }
+
+  /**
+   * A stub to allow clients to do synchronous rpc calls to service Contexts.
+   * <pre>
+   * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+   * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+   * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+   * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+   * </pre>
+   */
+  public static final class ContextsBlockingV2Stub
+      extends io.grpc.stub.AbstractBlockingStub<ContextsBlockingV2Stub> {
+    private ContextsBlockingV2Stub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      super(channel, callOptions);
+    }
+
+    @java.lang.Override
+    protected ContextsBlockingV2Stub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      return new ContextsBlockingV2Stub(channel, callOptions);
+    }
+
+    /**
+     * <pre>
+     * Returns the list of all contexts in the specified session.
+     * </pre>
+     */
+    public com.ondewo.nlu.ListContextsResponse listContexts(com.ondewo.nlu.ListContextsRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getListContextsMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Retrieves the specified context.
+     * </pre>
+     */
+    public com.ondewo.nlu.Context getContext(com.ondewo.nlu.GetContextRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getGetContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Creates a context.
+     * </pre>
+     */
+    public com.ondewo.nlu.Context createContext(com.ondewo.nlu.CreateContextRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getCreateContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Updates the specified context.
+     * </pre>
+     */
+    public com.ondewo.nlu.Context updateContext(com.ondewo.nlu.UpdateContextRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getUpdateContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Deletes the specified context.
+     * </pre>
+     */
+    public com.google.protobuf.Empty deleteContext(com.ondewo.nlu.DeleteContextRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getDeleteContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Deletes all active contexts in the specified session.
+     * </pre>
+     */
+    public com.google.protobuf.Empty deleteAllContexts(com.ondewo.nlu.DeleteAllContextsRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getDeleteAllContextsMethod(), getCallOptions(), request);
+    }
+  }
+
+  /**
+   * A stub to allow clients to do limited synchronous rpc calls to service Contexts.
+   * <pre>
+   * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+   * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+   * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+   * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+   * </pre>
+   */
+  public static final class ContextsBlockingStub
+      extends io.grpc.stub.AbstractBlockingStub<ContextsBlockingStub> {
+    private ContextsBlockingStub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      super(channel, callOptions);
+    }
+
+    @java.lang.Override
+    protected ContextsBlockingStub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      return new ContextsBlockingStub(channel, callOptions);
+    }
+
+    /**
+     * <pre>
+     * Returns the list of all contexts in the specified session.
+     * </pre>
+     */
+    public com.ondewo.nlu.ListContextsResponse listContexts(com.ondewo.nlu.ListContextsRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getListContextsMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Retrieves the specified context.
+     * </pre>
+     */
+    public com.ondewo.nlu.Context getContext(com.ondewo.nlu.GetContextRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getGetContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Creates a context.
+     * </pre>
+     */
+    public com.ondewo.nlu.Context createContext(com.ondewo.nlu.CreateContextRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getCreateContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Updates the specified context.
+     * </pre>
+     */
+    public com.ondewo.nlu.Context updateContext(com.ondewo.nlu.UpdateContextRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getUpdateContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Deletes the specified context.
+     * </pre>
+     */
+    public com.google.protobuf.Empty deleteContext(com.ondewo.nlu.DeleteContextRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getDeleteContextMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Deletes all active contexts in the specified session.
+     * </pre>
+     */
+    public com.google.protobuf.Empty deleteAllContexts(com.ondewo.nlu.DeleteAllContextsRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getDeleteAllContextsMethod(), getCallOptions(), request);
+    }
+  }
+
+  /**
+   * A stub to allow clients to do ListenableFuture-style rpc calls to service Contexts.
+   * <pre>
+   * A context represents additional information included with user input or with an intent returned by the Dialogflow API. Contexts are helpful for differentiating user input which may be vague or have a different meaning depending on additional details from your application such as user setting and preferences, previous user input, where the user is in your application, geographic location, and so on.
+   * You can include contexts as input parameters of a &lt;a href="index.html#ondewo.nlu.Sessions.DetectIntent"&gt;DetectIntent&lt;/a&gt; (or &lt;a href="index.html#ondewo.nlu.Sessions.StreamingDetectIntent"&gt;StreamingDetectIntent&lt;/a&gt;) request, or as output contexts included in the returned intent.
+   * Contexts expire when an intent is matched, after the number of &lt;code&gt;DetectIntent&lt;/code&gt; requests specified by the &lt;code&gt;lifespan_count&lt;/code&gt; parameter, or after 10 minutes if no intents are matched for a &lt;code&gt;DetectIntent&lt;/code&gt; request.
+   * For more information about contexts, see the &lt;a href="https://dialogflow.com/docs/contexts"&gt;Dialogflow documentation&lt;/a&gt;.
+   * </pre>
+   */
+  public static final class ContextsFutureStub
+      extends io.grpc.stub.AbstractFutureStub<ContextsFutureStub> {
+    private ContextsFutureStub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      super(channel, callOptions);
+    }
+
+    @java.lang.Override
+    protected ContextsFutureStub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+      return new ContextsFutureStub(channel, callOptions);
+    }
+
+    /**
+     * <pre>
+     * Returns the list of all contexts in the specified session.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.ListContextsResponse> listContexts(
+        com.ondewo.nlu.ListContextsRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getListContextsMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Retrieves the specified context.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.Context> getContext(
+        com.ondewo.nlu.GetContextRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getGetContextMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Creates a context.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.Context> createContext(
+        com.ondewo.nlu.CreateContextRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getCreateContextMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Updates the specified context.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.Context> updateContext(
+        com.ondewo.nlu.UpdateContextRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getUpdateContextMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Deletes the specified context.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> deleteContext(
+        com.ondewo.nlu.DeleteContextRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getDeleteContextMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Deletes all active contexts in the specified session.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> deleteAllContexts(
+        com.ondewo.nlu.DeleteAllContextsRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getDeleteAllContextsMethod(), getCallOptions()), request);
+    }
+  }
+
+  private static final int METHODID_LIST_CONTEXTS = 0;
+  private static final int METHODID_GET_CONTEXT = 1;
+  private static final int METHODID_CREATE_CONTEXT = 2;
+  private static final int METHODID_UPDATE_CONTEXT = 3;
+  private static final int METHODID_DELETE_CONTEXT = 4;
+  private static final int METHODID_DELETE_ALL_CONTEXTS = 5;
+
+  private static final class MethodHandlers<Req, Resp> implements
+      io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
+      io.grpc.stub.ServerCalls.ServerStreamingMethod<Req, Resp>,
+      io.grpc.stub.ServerCalls.ClientStreamingMethod<Req, Resp>,
+      io.grpc.stub.ServerCalls.BidiStreamingMethod<Req, Resp> {
+    private final AsyncService serviceImpl;
+    private final int methodId;
+
+    MethodHandlers(AsyncService serviceImpl, int methodId) {
+      this.serviceImpl = serviceImpl;
+      this.methodId = methodId;
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("unchecked")
+    public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
+      switch (methodId) {
+        case METHODID_LIST_CONTEXTS:
+          serviceImpl.listContexts((com.ondewo.nlu.ListContextsRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.ListContextsResponse>) responseObserver);
+          break;
+        case METHODID_GET_CONTEXT:
+          serviceImpl.getContext((com.ondewo.nlu.GetContextRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.Context>) responseObserver);
+          break;
+        case METHODID_CREATE_CONTEXT:
+          serviceImpl.createContext((com.ondewo.nlu.CreateContextRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.Context>) responseObserver);
+          break;
+        case METHODID_UPDATE_CONTEXT:
+          serviceImpl.updateContext((com.ondewo.nlu.UpdateContextRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.Context>) responseObserver);
+          break;
+        case METHODID_DELETE_CONTEXT:
+          serviceImpl.deleteContext((com.ondewo.nlu.DeleteContextRequest) request,
+              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
+          break;
+        case METHODID_DELETE_ALL_CONTEXTS:
+          serviceImpl.deleteAllContexts((com.ondewo.nlu.DeleteAllContextsRequest) request,
+              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
+          break;
+        default:
+          throw new AssertionError();
+      }
+    }
+
+    @java.lang.Override
+    @java.lang.SuppressWarnings("unchecked")
+    public io.grpc.stub.StreamObserver<Req> invoke(
+        io.grpc.stub.StreamObserver<Resp> responseObserver) {
+      switch (methodId) {
+        default:
+          throw new AssertionError();
+      }
+    }
+  }
+
+  public static final io.grpc.ServerServiceDefinition bindService(AsyncService service) {
+    return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
+        .addMethod(
+          getListContextsMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.ListContextsRequest,
+              com.ondewo.nlu.ListContextsResponse>(
+                service, METHODID_LIST_CONTEXTS)))
+        .addMethod(
+          getGetContextMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.GetContextRequest,
+              com.ondewo.nlu.Context>(
+                service, METHODID_GET_CONTEXT)))
+        .addMethod(
+          getCreateContextMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.CreateContextRequest,
+              com.ondewo.nlu.Context>(
+                service, METHODID_CREATE_CONTEXT)))
+        .addMethod(
+          getUpdateContextMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.UpdateContextRequest,
+              com.ondewo.nlu.Context>(
+                service, METHODID_UPDATE_CONTEXT)))
+        .addMethod(
+          getDeleteContextMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.DeleteContextRequest,
+              com.google.protobuf.Empty>(
+                service, METHODID_DELETE_CONTEXT)))
+        .addMethod(
+          getDeleteAllContextsMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.DeleteAllContextsRequest,
+              com.google.protobuf.Empty>(
+                service, METHODID_DELETE_ALL_CONTEXTS)))
+        .build();
+  }
+
+  private static abstract class ContextsBaseDescriptorSupplier
+      implements io.grpc.protobuf.ProtoFileDescriptorSupplier, io.grpc.protobuf.ProtoServiceDescriptorSupplier {
+    ContextsBaseDescriptorSupplier() {}
+
+    @java.lang.Override
+    public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
+      return com.ondewo.nlu.ContextProto.getDescriptor();
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Descriptors.ServiceDescriptor getServiceDescriptor() {
+      return getFileDescriptor().findServiceByName("Contexts");
+    }
+  }
+
+  private static final class ContextsFileDescriptorSupplier
+      extends ContextsBaseDescriptorSupplier {
+    ContextsFileDescriptorSupplier() {}
+  }
+
+  private static final class ContextsMethodDescriptorSupplier
+      extends ContextsBaseDescriptorSupplier
+      implements io.grpc.protobuf.ProtoMethodDescriptorSupplier {
+    private final java.lang.String methodName;
+
+    ContextsMethodDescriptorSupplier(java.lang.String methodName) {
+      this.methodName = methodName;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Descriptors.MethodDescriptor getMethodDescriptor() {
+      return getServiceDescriptor().findMethodByName(methodName);
+    }
+  }
+
+  private static volatile io.grpc.ServiceDescriptor serviceDescriptor;
+
+  public static io.grpc.ServiceDescriptor getServiceDescriptor() {
+    io.grpc.ServiceDescriptor result = serviceDescriptor;
+    if (result == null) {
+      synchronized (ContextsGrpc.class) {
+        result = serviceDescriptor;
+        if (result == null) {
+          serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
+              .setSchemaDescriptor(new ContextsFileDescriptorSupplier())
+              .addMethod(getListContextsMethod())
+              .addMethod(getGetContextMethod())
+              .addMethod(getCreateContextMethod())
+              .addMethod(getUpdateContextMethod())
+              .addMethod(getDeleteContextMethod())
+              .addMethod(getDeleteAllContextsMethod())
+              .build();
+        }
+      }
+    }
+    return result;
+  }
+}

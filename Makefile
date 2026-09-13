@@ -202,9 +202,12 @@ package: ## Compile the generated stubs and package the jar locally (needs a JDK
 	@test -f pom.xml || { echo "$(RED)[ERROR]$(NC) no pom.xml - it is generated, run 'make build' first"; exit 1; }
 	mvn -B --no-transfer-progress -DskipTests package
 
-test: check_build ## Run the java test suite and verify every proto produced java code
+# `verify`, not `test`: the jacoco coverage gate on the hand-written sources is bound to the
+# verify phase, so `mvn test` alone would run the suite but skip the gate - and local and CI
+# would disagree about what "the tests pass" means.
+test: check_build ## Run the java test suite + the coverage gate, and verify every proto produced java code
 	@test -f pom.xml || { echo "$(RED)[ERROR]$(NC) no pom.xml - it is generated, run 'make build' first"; exit 1; }
-	mvn -B --no-transfer-progress test
+	mvn -B --no-transfer-progress verify
 
 clean: ## Remove the local maven build output (never touches the generated sources)
 	rm -rf target

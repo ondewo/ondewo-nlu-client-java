@@ -5,14 +5,20 @@ on:
     branches: ["**"]
   pull_request:
 
+# This workflow builds and tests the COMMITTED stubs. It deliberately does NOT build the
+# ondewo-java-proto-compiler image and does NOT run the generator: that needs both submodules
+# and a docker build, is minutes slow, and is a separate integration concern owned by
+# `make build`. Nothing here is conditional - a missing or broken client fails the run instead
+# of skipping a step and reporting green.
+
 jobs:
   lint:
     name: pre-commit (markdown + hygiene)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -34,38 +40,61 @@ jobs:
         # image itself ships - the jar has to build on both.
         java-version: ["11", "21"]
     steps:
-      # The api submodule is needed by `make check_build`, which matches every .proto against
-      # the java code generated for it.
-      - uses: actions/checkout@v5
-        with:
-          submodules: recursive
+      # No `submodules:` - the stubs are committed, so neither ondewo-nlu-api nor
+      # ondewo-proto-compiler is needed to compile and test them.
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
           cache: maven
 
-      # A freshly instantiated repository has no generated client yet: warn loudly and skip the
-      # java steps rather than failing with maven's opaque "there is no POM in this directory".
-      - name: Check that the generated client is committed
-        id: generated
+      # A hard gate, not a guard: an empty scaffold must turn this job RED, because every
+      # step after it would otherwise pass vacuously.
+      - name: Assert the generated client is committed
         run: |
-          if [ -f pom.xml ] && [ -d src/main/java ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::No generated client found (pom.xml / src/main/java) - run 'make build' and commit the result."
-          fi
+          set -euo pipefail
+          test -f pom.xml || { echo "::error::pom.xml is missing - run 'make build' and commit the result"; exit 1; }
+          test -d src/main/java || { echo "::error::src/main/java is missing - run 'make build' and commit the result"; exit 1; }
+          stubs=$(find src/main/java -name '*.java' | wc -l)
+          services=$(find src/main/java -name '*Grpc.java' | wc -l)
+          echo "committed stubs: $stubs java files, $services gRPC service classes"
+          test "$stubs" -gt 100 || { echo "::error::only $stubs generated java files - the client looks truncated"; exit 1; }
+          test "$services" -gt 0 || { echo "::error::no *Grpc.java service stubs found"; exit 1; }
 
-      - name: Verify that every proto produced java code
-        if: steps.generated.outputs.present == 'true'
-        run: make check_build
+      # `verify` = compile the stubs, run the JUnit 5 suite against them, write the jacoco
+      # report and enforce the 100% coverage rule on the hand-written sources. It also builds
+      # the jar and the sources jar, so a packaging regression fails here too.
+      - name: Build, test and check coverage
+        run: mvn -B --no-transfer-progress verify
 
-      - name: Package the jar
-        if: steps.generated.outputs.present == 'true'
-        run: mvn -B --no-transfer-progress -DskipTests package
+      # jacoco:check SKIPS itself when no execution data was written, so a build in which the
+      # agent never attached would pass the gate vacuously. This step closes that hole: after
+      # a green `verify` the report must exist and must actually list a class.
+      - name: Coverage summary (hand-written sources)
+        run: |
+          set -euo pipefail
+          report=target/site/jacoco/jacoco.csv
+          test -f "$report" || { echo "::error::no jacoco report at $report - the coverage gate did not run"; exit 1; }
+          test "$(tail -n +2 "$report" | wc -l)" -gt 0 || { echo "::error::the jacoco report is empty - no hand-written class was measured"; exit 1; }
+          {
+            echo "### JaCoCo - hand-written sources (JDK ${{ matrix.java-version }})"
+            echo ""
+            echo "| class | instructions | branches | lines | methods |"
+            echo "| --- | --- | --- | --- | --- |"
+            awk -F, 'NR > 1 {
+              printf "| %s.%s | %d/%d | %d/%d | %d/%d | %d/%d |\n", $2, $3,
+                     $5, $4 + $5, $7, $6 + $7, $9, $8 + $9, $13, $12 + $13
+            }' "$report"
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$report"
 
-      - name: Run the test suite
-        if: steps.generated.outputs.present == 'true'
-        run: mvn -B --no-transfer-progress test
+      # Reporting only - `if: always()` so a failed run still yields the HTML report to look at.
+      - name: Upload the coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-jdk${{ matrix.java-version }}
+          path: target/site/jacoco/
+          if-no-files-found: warn

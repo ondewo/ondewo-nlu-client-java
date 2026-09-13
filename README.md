@@ -115,11 +115,9 @@ ls src/main/java/ondewo/nlu/*Grpc.java
 A minimal call, with the bearer token ONDEWO servers expect attached to every request:
 
 ```java
-import io.grpc.CallCredentials;
+import com.ondewo.nlu.auth.BearerToken;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
 
 String host = System.getenv("ONDEWO_HOST");
 int port = Integer.parseInt(System.getenv("ONDEWO_PORT"));
@@ -130,17 +128,18 @@ ManagedChannel channel = ManagedChannelBuilder
     .useTransportSecurity()   // .usePlaintext() for a local, unencrypted server
     .build();
 
-Metadata headers = new Metadata();
-headers.put(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER), "Bearer " + accessToken);
-
 // Replace <Service> with one of the services declared in the ondewo-nlu-api protos.
-<Service>Grpc.<Service>BlockingStub stub = <Service>Grpc
-    .newBlockingStub(channel)
-    .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
+<Service>Grpc.<Service>BlockingStub stub = new BearerToken(accessToken)
+    .attachTo(<Service>Grpc.newBlockingStub(channel));
 
 // ... issue requests through `stub`, then shut the channel down:
 channel.shutdownNow();
 ```
+
+`BearerToken` is the one hand-written class of this client (see
+[Hand-written code beside the stubs](#hand-written-code-beside-the-stubs)); it wraps the
+`authorization: Bearer <token>` header every ONDEWO server expects. Attaching the header by hand
+with `MetadataUtils.newAttachHeadersInterceptor(...)` works just as well.
 
 Note that the protos do not set `java_multiple_files`, so messages are nested inside the outer
 class protoc names after the proto file (`entity_type.proto` → `EntityTypeProto`,
@@ -228,11 +227,28 @@ a regeneration as long as they live in their own package (for example
 ## Testing
 
 ```bash
-make test
+make test          # check_build + mvn verify (suite + coverage gate)
+mvn -B verify      # the same without the submodule-dependent check_build
 ```
 
-runs `check_build` (every proto produced java code) and then `mvn test`. The same two steps run
-in CI for JDK 11 and JDK 21 on every push — see `.github/workflows/ci.yml`.
+The JUnit 5 suite under `src/test/java` exercises the **committed** stubs — it never builds the
+compiler image and never runs protoc:
+
+| Test class | What it proves |
+| --- | --- |
+| `com.ondewo.nlu.stubs.GeneratedMessagesTest` | messages of both java flavours (`java_multiple_files` → `com.ondewo.nlu`, outer class → `ondewo.nlu`) survive a serialize/parse round trip, `optional` scalars keep explicit presence on the wire, enums start at their `*_UNSPECIFIED` zero value, and the proto package in the descriptor is untouched by the `java_package` rewrite |
+| `com.ondewo.nlu.stubs.GeneratedServicesTest` | every generated `*Grpc` class (found on the compiled classpath, not listed by hand) exposes a usable `ServiceDescriptor`; a unary call runs end to end over the in-process transport and the real generated marshallers; all three stub flavours build against a plain target channel |
+| `com.ondewo.nlu.auth.BearerTokenTest` | the hand-written `BearerToken` — validation, header shape, stub immutability |
+
+Coverage is measured with **JaCoCo over the hand-written sources only**
+(`com/ondewo/nlu/auth/**`). Generated stubs are machine output and are excluded from the metric,
+but they are exercised by the two test classes above. The gate is bound to `verify` and fails the
+build below **100 %** instruction, branch and method coverage; the HTML report lands in
+`target/site/jacoco/`.
+
+CI runs the whole thing on `ubuntu-latest` for JDK 11 and JDK 21 on every push and pull request
+— see `.github/workflows/ci.yml`. No step is conditional: a missing or truncated client turns the
+run red instead of skipping.
 
 ## Release
 
