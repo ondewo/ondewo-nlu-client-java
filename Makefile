@@ -44,7 +44,7 @@ ONDEWO_NLU_VERSION=7.1.0
 # every `make build` runs first, so a build can never silently use whatever the submodule
 # happened to be left at.
 ONDEWO_NLU_API_GIT_BRANCH=tags/7.1.0
-ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.0
+ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.1
 
 # You need to setup an access token at https://github.com/settings/tokens - permissions are important
 GITHUB_GH_TOKEN?=ENTER_YOUR_TOKEN_HERE
@@ -257,9 +257,16 @@ checkout_defined_submodule_versions: ## Check out the submodule versions pinned 
 
 release: ## Automate the entire release process
 	@echo "Start Release"
-# FIRST, before anything is built, branched or tagged: a release that cannot reach Maven
-# Central has to fail while it is still a no-op, not after the tag is pushed.
+# FIRST, before anything is built, branched or tagged. A credential that is only exercised by
+# push_to_gh or push_to_maven_central_via_docker is exercised far too late: by then the release
+# branch and the tag are on origin, a tag is not correctable, and `make spc` refuses every retry
+# because that branch and tag now exist. Both registries this release talks to are proven here,
+# while the whole thing is still a no-op.
 	make check_maven_central_credentials
+	make check_gh_token
+# Same reasoning for the notes: `gh release create -n ""` publishes an EMPTY release without
+# complaining, and the tag that named it can no longer be moved.
+	make check_release_notes
 	make build
 	-make precommit_hooks_run_all_files
 	make check_build
@@ -298,10 +305,31 @@ create_release_tag: ## Create Release Tag and push it to origin
 	git tag -a ${ONDEWO_NLU_VERSION} -m "release/${ONDEWO_NLU_VERSION}"
 	git push origin ${ONDEWO_NLU_VERSION}
 
-login_to_gh: ## Login to Github CLI with Access Token
-	@echo $(GITHUB_GH_TOKEN) | gh auth login -p ssh --with-token
+check_gh_token: ## Fail loudly when GITHUB_GH_TOKEN is unset or still the placeholder
+# Without this, an unset token reaches `gh auth login --with-token` as an empty stdin and the
+# failure surfaces only in push_to_gh - after create_release_tag has already pushed the tag.
+	@if [ -z "${GITHUB_GH_TOKEN}" ] || [ "${GITHUB_GH_TOKEN}" = "ENTER_YOUR_TOKEN_HERE" ]; then \
+		echo "$(RED)[ERROR]$(NC) GITHUB_GH_TOKEN is not set - create one at https://github.com/settings/tokens"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)[SUCCESS]$(NC) GITHUB_GH_TOKEN is set"
 
-build_gh_release: ## Generate Github Release with CLI and attach the built jars
+login_to_gh: check_gh_token ## Login to Github CLI with Access Token
+	@echo "${GITHUB_GH_TOKEN}" | gh auth login -p ssh --with-token
+
+check_release_notes: ## Assert RELEASE.md carries an entry for ONDEWO_NLU_VERSION
+# `gh release create -n ""` succeeds and publishes an EMPTY release, so an entry that was
+# forgotten - or a heading whose wording drifted away from what the CURRENT_RELEASE_NOTES
+# flip-flop greps for - is otherwise only noticed by whoever reads the release page afterwards.
+	@notes="$(CURRENT_RELEASE_NOTES)"; \
+	if [ -z "$$notes" ]; then \
+		echo "$(RED)[ERROR]$(NC) RELEASE.md has no 'Release ONDEWO NLU Java Client ${ONDEWO_NLU_VERSION}' entry"; \
+		echo "        The GitHub release would be created with empty notes - add the entry first."; \
+		exit 1; \
+	fi; \
+	echo "$(GREEN)[SUCCESS]$(NC) RELEASE.md has release notes for ${ONDEWO_NLU_VERSION}"
+
+build_gh_release: check_release_notes ## Generate Github Release with CLI and attach the built jars
 	@test -n "$(wildcard target/*.jar)" || { echo "$(RED)[ERROR]$(NC) no jar in target/ - run 'make build' first"; exit 1; }
 	gh release create --repo $(GH_REPO) "$(ONDEWO_NLU_VERSION)" \
 		-n "$(CURRENT_RELEASE_NOTES)" \

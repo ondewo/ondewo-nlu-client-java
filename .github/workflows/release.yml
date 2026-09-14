@@ -35,7 +35,7 @@ jobs:
     name: publish to Maven Central
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # FIRST, before the build: without the credentials there is nothing this workflow can
       # do, and a run that reports success while having published nothing is worse than a red
@@ -73,7 +73,7 @@ jobs:
           fi
           echo "publishing com.ondewo:ondewo-nlu-client-java:$pom_version"
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"

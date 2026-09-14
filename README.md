@@ -361,6 +361,10 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 `giticket` hook prepends the JIRA ticket taken from the branch name, so never write the ticket
 prefix yourself.
 
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
+
 ## Links
 
 * [ONDEWO NLU API (protos)](https://github.com/ondewo/ondewo-nlu-api)
