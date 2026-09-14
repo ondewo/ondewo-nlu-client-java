@@ -60,7 +60,7 @@ jobs:
           stubs=$(find src/main/java -name '*.java' | wc -l)
           services=$(find src/main/java -name '*Grpc.java' | wc -l)
           echo "committed stubs: $stubs java files, $services gRPC service classes"
-          test "$stubs" -gt 100 || { echo "::error::only $stubs generated java files - the client looks truncated"; exit 1; }
+          test "$stubs" -gt 100 || { echo "::error::only $stubs generated java files, expected at least 101 - the client looks truncated"; exit 1; }
           test "$services" -gt 0 || { echo "::error::no *Grpc.java service stubs found"; exit 1; }
 
       # `verify` = compile the stubs, run the JUnit 5 suite against them, write the jacoco
