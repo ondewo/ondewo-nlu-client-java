@@ -3,10 +3,10 @@
   Maven settings used ONLY by the Maven Central publishing step (`mvn -s maven-central-settings.xml`).
 
   It contains NO credential: `${env.X}` is interpolated by maven at run time, so the token
-  lives exclusively in the process environment - fed by the ondewo-devops-accounts
-  `account_maven_central.env` locally and by GitHub Actions secrets in CI. That is the same
-  indirection actions/setup-java generates, written down here so the Makefile and the workflow
-  use one identical file.
+  lives exclusively in the process environment. Its only source is
+  ondewo-devops-accounts/account_maven_central.env, which `make ondewo_release` reads and hands
+  to the publishing container of `make release` - no CI workflow publishes, and no repository
+  secret holds it.
 
   `central` is the <publishingServerId> the central-publishing-maven-plugin looks up in the
   pom's `release` profile. Username and password are the two halves of a Central Portal USER

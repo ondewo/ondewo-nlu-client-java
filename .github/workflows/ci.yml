@@ -5,17 +5,11 @@ on:
     branches: ["**"]
   pull_request:
 
-# The default GITHUB_TOKEN is read-write. Nothing here writes to the repository - this job only
-# reads the tree, builds it and uploads an artifact - so it runs with the least privilege that
-# still lets actions/checkout fetch the code.
+# The default GITHUB_TOKEN is read-write. Nothing here writes to the repository - these jobs only
+# read the tree, lint and test it and upload the coverage report - so they run with the least
+# privilege that still lets actions/checkout fetch the code.
 permissions:
   contents: read
-
-# This workflow builds and tests the COMMITTED stubs. It deliberately does NOT build the
-# ondewo-java-proto-compiler image and does NOT run the generator: that needs both submodules
-# and a docker build, is minutes slow, and is a separate integration concern owned by
-# `make build`. Nothing here is conditional - a missing or broken client fails the run instead
-# of skipping a step and reporting green.
 
 jobs:
   lint:
@@ -42,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 11 is the bytecode floor the generated pom compiles against, 21 the JDK the compiler
+        # 11 is the bytecode floor the pom compiles against, 21 the JDK the compiler
         # image itself ships - the jar has to build on both.
         java-version: ["11", "21"]
     steps:
@@ -61,7 +55,7 @@ jobs:
       - name: Assert the generated client is committed
         run: |
           set -euo pipefail
-          test -f pom.xml || { echo "::error::pom.xml is missing - run 'make build' and commit the result"; exit 1; }
+          test -f pom.xml || { echo "::error::pom.xml is missing - it is hand-maintained, restore it with 'git checkout pom.xml'"; exit 1; }
           test -d src/main/java || { echo "::error::src/main/java is missing - run 'make build' and commit the result"; exit 1; }
           stubs=$(find src/main/java -name '*.java' | wc -l)
           services=$(find src/main/java -name '*Grpc.java' | wc -l)
@@ -70,8 +64,9 @@ jobs:
           test "$services" -gt 0 || { echo "::error::no *Grpc.java service stubs found"; exit 1; }
 
       # `verify` = compile the stubs, run the JUnit 5 suite against them, write the jacoco
-      # report and enforce the 100% coverage rule on the hand-written sources. It also builds
-      # the jar and the sources jar, so a packaging regression fails here too.
+      # report and enforce the 100% coverage rule on the hand-written sources - the same command
+      # as `make test`. The jars it builds on the way (so a javadoc break fails here too) never
+      # leave the runner.
       - name: Build, test and check coverage
         run: mvn -B --no-transfer-progress verify
 
@@ -104,37 +99,3 @@ jobs:
           name: jacoco-jdk${{ matrix.java-version }}
           path: target/site/jacoco/
           if-no-files-found: warn
-
-  publish-dry-run:
-    name: maven central dry run
-    runs-on: ubuntu-latest
-    # The packaging path a RELEASE takes, exercised on every push with no credential at all.
-    # `make dry_run_maven_central` builds with the `release` profile, signs every artifact with
-    # a throwaway key it generates on the spot, and verifies the signatures - so a pom that
-    # Maven Central would reject, a javadoc jar that stopped building or a broken signing
-    # configuration turns THIS job red, months before somebody cuts a release.
-    # It can never publish: the central-publishing goal is bound to `deploy`, and this stops
-    # at `verify`.
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: maven
-
-      - name: Rehearse the Maven Central deployment
-        run: make dry_run_maven_central
-
-      - name: List the deployment bundle
-        run: |
-          set -euo pipefail
-          {
-            echo "### Maven Central deployment bundle (dry run)"
-            echo ""
-            echo "| file | bytes |"
-            echo "| --- | --- |"
-            find target -maxdepth 1 -type f \( -name '*.jar' -o -name '*.asc' \) \
-              -exec ls -l {} \; | awk '{ printf "| %s | %s |\n", $NF, $5 }' | sort
-          } >> "$GITHUB_STEP_SUMMARY"

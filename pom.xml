@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Maven build descriptor of the ONDEWO NLU java client.
+  Maven build descriptor of the ONDEWO NLU java client. HAND-MAINTAINED.
 
-  Everything above the "HAND-WRITTEN" marker below is BUILD OUTPUT: it is rendered by
-  ondewo-proto-compiler/java/image-data/make-lib-entry-point.sh from its pom template, with the
-  maven coordinates taken from the `docker run` arguments in `make generate_ondewo_protos` and
-  every toolchain version from the image ENV (set from the Dockerfile ARGs). That indirection
-  guarantees the generated part can never name a version that is absent from the image's
-  pre-warmed offline maven repository.
+  Everything outside the "HAND-WRITTEN" blocks below mirrors the pom template of
+  ondewo-proto-compiler/java/image-data/make-lib-entry-point.sh, with the maven coordinates
+  taken from the `docker run` arguments in `make generate_ondewo_protos` and every toolchain
+  version from the image ENV (set from the Dockerfile ARGs).
 
-  IMPORTANT: `make generate_ondewo_protos` OVERWRITES this file with a freshly rendered
-  template, which does NOT contain the hand-written configuration below. After a
-  regeneration, re-apply ALL FOUR HAND-WRITTEN blocks or the client silently stops being
-  publishable / testable:
+  The compiler image OVERWRITES this file with its freshly rendered template, which does NOT
+  contain the four HAND-WRITTEN blocks:
     1. Maven Central metadata  (developers + scm, and the url pointing at THIS repository)
     2. test dependencies       (junit-jupiter + grpc-inprocess)
     3. surefire + jacoco       (the test run and the coverage gate)
     4. javadoc + the release profile (gpg signing + central-publishing)
-  `make check_central_pom` fails loudly when block 1 or 4 has been lost, so a regeneration
-  cannot silently produce a jar that Maven Central would reject. The permanent fix is to add
-  the same blocks to the template in
-  ondewo-proto-compiler/java/image-data/default-lib-files/pom.xml.
+  So `make generate_ondewo_protos` saves this file before the run and restores it afterwards,
+  and `make update_pom_version` writes ONDEWO_NLU_VERSION into the project version. It also
+  fails when the rendered template carries other toolchain pins (maven.compiler.release,
+  grpc.version, protobuf.version, google.common.protos.version) than the properties below: the
+  stubs are generated for those, so a new value has to be copied in here by hand.
+  `make check_central_pom` fails loudly when block 1 or 4 has been lost, so a pom Maven Central
+  would reject is never uploaded.
 
   NOTE: XML comments may not contain a double hyphen, so protoc/maven flags are spelled
   without their leading dashes throughout this file.
@@ -287,9 +286,11 @@
        developer and the CI build job runs - needs neither a GPG key nor a Portal token.
 
        `mvn Prelease verify`  signs everything and publishes NOTHING (the publish goal is
-                              bound to `deploy`). That is the credential-free rehearsal CI
-                              runs with a throwaway key: see `make dry_run_maven_central`.
-       `mvn Prelease deploy`  is the only command that uploads. See `make publish_to_maven_central`. -->
+                              bound to `deploy`). That is the credential-free rehearsal
+                              `make release` runs with a throwaway key before it pushes
+                              anything: see `make dry_run_maven_central`.
+       `mvn Prelease deploy`  is the only command that uploads, and it also publishes. It runs
+                              only locally, from `make release`: see `make publish_to_maven_central`. -->
   <profiles>
     <profile>
       <id>release</id>
@@ -297,7 +298,7 @@
         <plugins>
           <!-- Central requires a detached PGP signature next to every artifact.
                signer `bc`: the pure-java BouncyCastle signer, so no gpg binary, no keyring
-               and no gpg-agent has to exist in the container or the runner. It takes the
+               and no gpg-agent has to exist in the publishing container. It takes the
                ASCII-armored secret key from MAVEN_GPG_KEY and the passphrase from
                MAVEN_GPG_PASSPHRASE, which is also why bestPractices can be on: neither
                secret is ever a pom value, a settings.xml value or a command line argument. -->
@@ -323,9 +324,17 @@
           <!-- extensions=true replaces maven-deploy-plugin in the `deploy` phase, so `deploy`
                uploads a Portal bundle instead of trying to write to a distributionManagement
                repository this pom deliberately does not declare.
-               autoPublish=false: the deployment is validated and then WAITS in the Portal for
-               a human to press Publish. Releasing to Central is irreversible - a version can
-               never be replaced or withdrawn - so the last step stays manual on purpose.
+               autoPublish=true + waitUntil=published: the Portal validates the deployment and
+               publishes it with no human involved, and `deploy` returns only once Central
+               reports it PUBLISHED. A deployment the Portal rejects, or one that is still not
+               published after waitMaxTime, fails the build, so `make release` never creates the
+               GitHub release of a version that is not on Maven Central.
+               waitMaxTime=3600 seconds: publishing normally takes minutes, the plugin raises any
+               value below 1800 seconds to 1800, and the extra half hour absorbs a slow Portal
+               instead of failing a release whose tag is already pushed.
+               Publishing is irreversible - a version can never be replaced or withdrawn - so
+               `make release` proves the credentials, the build, the tests and the signing
+               before it pushes the tag and runs this.
                Credentials are read from the `central` server of the settings.xml that
                maven-central-settings.xml interpolates out of the environment. -->
           <plugin>
@@ -335,8 +344,9 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
-              <autoPublish>false</autoPublish>
-              <waitUntil>validated</waitUntil>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+              <waitMaxTime>3600</waitMaxTime>
               <deploymentName>${project.groupId}:${project.artifactId}:${project.version}</deploymentName>
             </configuration>
           </plugin>

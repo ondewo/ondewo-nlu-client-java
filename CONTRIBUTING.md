@@ -40,20 +40,22 @@ Before you open a pull request:
 
 ```bash
 make precommit_hooks_run_all_files   # markdownlint + hygiene hooks
-make test                            # check_build + the maven test suite
+make test                            # check_build + the maven test suite (local JDK + maven)
+make test_via_docker                 # the same inside the utils image - needs only docker
 ```
 
 Things to keep in mind:
 
-* **Almost nothing here is hand-written.** `src/main/java` and `pom.xml` are produced by the
+* **Almost nothing here is hand-written.** `src/main/java` is produced by the
   `ondewo-java-proto-compiler` image. A change to the generated code belongs in
   [ondewo-nlu-api](https://github.com/ondewo/ondewo-nlu-api) (the protos) or in
   [ondewo-proto-compiler](https://github.com/ondewo/ondewo-proto-compiler) (the generator) - never
-  in the generated files, which the next `make build` overwrites.
+  in the generated files, which the next `make build` overwrites. `pom.xml` is the exception: it
+  is hand-maintained, and `make build` keeps it.
 * **Hand-written classes live in their own java package** (for example
   `src/main/java/com/ondewo/nlu/auth/`). The generator deletes only the leaf packages it
   regenerates, so a class placed in a package that holds stubs disappears on the next run. It must
-  also compile against the generated `pom.xml`, which declares gRPC and protobuf and nothing else.
+  also compile against `pom.xml`, which declares gRPC and protobuf and nothing else at runtime.
 * **Versions are bumped in the `Makefile`**, never in `pom.xml`: `ONDEWO_NLU_VERSION`
   is written into the descriptor by the next `make build`, and must match the `ondewo-nlu-api` release
   in major and minor version.

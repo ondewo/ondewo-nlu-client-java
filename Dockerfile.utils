@@ -1,0 +1,35 @@
+# Utils image of ondewo-nlu-client-java (IMAGE_UTILS_NAME in the Makefile).
+#
+# Every step of `make build` / `make release` that needs maven, a JDK, gpg, curl or the GitHub CLI runs
+# in here, through the *_via_docker targets, so the release host needs only make, git, docker and perl -
+# the same split as the utils images of the other ONDEWO clients.
+#
+# Nothing is copied in: the Makefile MOUNTS the repository at /workspace and runs this image as the
+# invoking user (UTILS_DOCKER_RUN), so target/ and pom.xml land in the working tree, owned by that user.
+#
+# Pinned to the maven and JDK the ondewo-java-proto-compiler image builds the stubs with. JDK 21 compiles
+# the maven.compiler.release=11 bytecode of pom.xml, exactly like the JDK 21 job in ci.yml.
+FROM maven:3.9.16-eclipse-temurin-21
+
+ENV LANG=C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+# make + perl run the Makefile targets, git is used by gh, curl asks the Central Portal whether the user
+# token is accepted (check_maven_central_token_valid), and gnupg creates the throwaway key of
+# `make dry_run_maven_central` and test-signs with the release key (check_maven_gpg_key_valid). The
+# release itself signs with maven-gpg-plugin's pure-java `bc` signer.
+RUN apt-get update -qq \
+  && apt-get install -y -qq --no-install-recommends make git perl curl ca-certificates gnupg \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# The GitHub CLI, installed the same way as in the other ONDEWO client utils images.
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update -qq \
+    && apt-get install -y -qq gh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace

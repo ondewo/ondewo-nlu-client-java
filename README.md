@@ -28,17 +28,19 @@ It contains no hand-written protocol code. The service and message classes are g
 the protobuf definitions in the [ondewo-nlu-api](https://github.com/ondewo/ondewo-nlu-api) repository
 (vendored here as a git submodule) by the
 [ONDEWO proto compiler](https://github.com/ondewo/ondewo-proto-compiler) (vendored as a second
-submodule), which also renders the `pom.xml` and packages the jar. Everything under
-`src/main/java` and the `pom.xml` are therefore build output that happens to be committed, so
-the repository can be consumed and opened in an IDE without Docker.
+submodule). Everything under `src/main/java` except the hand-written classes is therefore build
+output that happens to be committed, so the repository can be consumed and opened in an IDE
+without Docker. The `pom.xml` is hand-maintained; a regeneration keeps it and only writes the
+version into it.
 
 ## Requirements
 
 | For | You need |
 | --- | --- |
 | Using the library | JDK 11 or newer (the jar is compiled with `maven.compiler.release=11`) |
-| Building the jar locally | JDK 11+ and Maven 3.6+ |
-| Regenerating the stubs | Docker, GNU Make, git |
+| Building the jar locally | JDK 11+ and Maven 3.6+ (`make package`), or only Docker and GNU Make (`make package_via_docker`) |
+| Regenerating the stubs (`make build`) | Docker, GNU Make, git, perl |
+| Releasing | GNU Make, git (with ssh access to GitHub and Bitbucket), Docker, perl — maven, the JDK, gpg, curl and the GitHub CLI run in the `ondewo-nlu-client-utils-java` image built from `Dockerfile.utils` |
 
 ## Installation
 
@@ -96,12 +98,13 @@ repositories { maven { url 'https://jitpack.io' } }
 dependencies { implementation 'com.github.ondewo:ondewo-nlu-client-java:VERSION' }
 ```
 
-### Jar from the GitHub release
+### Jar from a GitHub release (up to 7.1.0)
 
-Every [release](https://github.com/ondewo/ondewo-nlu-client-java/releases) carries the built
-`ondewo-nlu-client-java-<version>.jar` and its sources jar as assets. Install one into
-your local repository with the `pom.xml` of the matching tag, so the transitive gRPC and
-protobuf dependencies come along:
+The [releases](https://github.com/ondewo/ondewo-nlu-client-java/releases) up to 7.1.0 carry the
+built `ondewo-nlu-client-java-<version>.jar` and its sources jar as assets. From 7.2.0 on the
+jars are published only to Maven Central, and the GitHub release carries the release notes. Install
+such a jar into your local repository with the `pom.xml` of the matching tag, so the transitive
+gRPC and protobuf dependencies come along:
 
 ```bash
 mvn install:install-file \
@@ -124,7 +127,8 @@ It is then available as:
 ```bash
 git clone --recurse-submodules https://github.com/ondewo/ondewo-nlu-client-java.git
 cd ondewo-nlu-client-java
-make package        # compiles the committed stubs into target/*.jar
+make package        # compiles the committed stubs into target/*.jar (local JDK + maven)
+make package_via_docker   # the same inside the utils image - needs only Docker
 ```
 
 ## Usage
@@ -178,9 +182,11 @@ class protoc names after the proto file (`entity_type.proto` → `EntityTypeProt
 ├── ondewo-proto-compiler/    <----- submodule: the code generator (pinned to a release tag)
 ├── src/
 │   └── main/java/            <----- generated stubs (committed), plus hand-written sources
-├── pom.xml                   <----- generated build descriptor (committed)
+├── pom.xml                   <----- hand-maintained build descriptor; `make` writes its version
 ├── target/                   <----- build output (git-ignored)
+├── .m2/                      <----- maven cache of the utils image (git-ignored)
 ├── Makefile                  <----- every workflow: build, test, release
+├── Dockerfile.utils          <----- the utils image: maven, JDK, gpg, gh
 ├── maven-central-settings.xml <---- publishing settings; holds env references, no credential
 ├── RELEASE.md
 └── README.md
@@ -197,18 +203,22 @@ That target runs the whole pipeline and is the only supported way to regenerate:
 1. `update_submodules` — `git submodule update --init --recursive`.
 1. `checkout_defined_submodule_versions` — checks out the `ondewo-nlu-api` and
    `ondewo-proto-compiler` revisions pinned at the top of the `Makefile`.
-1. `build_compiler` — `cd ondewo-proto-compiler/java && sh build.sh`, which builds the
+1. `build_compiler` — `chmod -R a+rX ondewo-proto-compiler/java` (see the `--user` note below),
+   then `cd ondewo-proto-compiler/java && sh build.sh`, which builds the
    `ondewo-java-proto-compiler:latest` image. The image tag is the only contract; any locally
    built image with that tag is used.
-1. `generate_ondewo_protos` — the single `docker run` below.
+1. `generate_ondewo_protos` — the single `docker run` below, wrapped so that the hand-maintained
+   `pom.xml` survives it (see below), followed by `update_pom_version`.
 1. `check_build` — asserts that every `.proto` produced java code.
-1. `package` — `mvn -DskipTests package` against the freshly rendered `pom.xml`.
+1. `package_via_docker` — `mvn -DskipTests package` against `pom.xml`, inside the
+   `ondewo-nlu-client-utils-java` image (`Dockerfile.utils`), so no local JDK or maven is needed.
 
 The generation step is exactly the contract documented in
 `ondewo-proto-compiler/java/example/run-compile.sh`:
 
 ```bash
-docker run --rm \
+docker run --rm --user $(id -u):$(id -g) \
+  -e HOME=/tmp -e TEMP_SRC_DIRECTORY=/tmp/src \
   -v $(pwd)/ondewo-nlu-api:/input-volume/ondewo-nlu-api \
   -v $(pwd)/LICENSE:/input-volume/LICENSE \
   -v $(pwd):/output-volume \
@@ -227,13 +237,21 @@ Things worth knowing about that invocation:
   `docker run -it --entrypoint /bin/bash -v ... ondewo-java-proto-compiler`.
 * **Only the api submodule is mounted as input**, not the whole repository. A `pom.xml` found at
   the input-volume root *wins* over the rendered template, so mounting the repository root would
-  freeze the library version at whatever the previously generated file says.
+  freeze the library version at whatever that file says.
 * **The output volume is the repository root**, which is precisely the maven project the image
-  emits. Expect a loud `WARNING: ... pom.xml ... is about to be OVERWRITTEN` on every run — that
-  is the descriptor being re-rendered from `ONDEWO_NLU_VERSION`, and is intended.
-* **The container runs as root** (it writes into the root-owned `/image-data` inside the image),
-  so the output is root-owned. `make fix_ownership` runs right after and `chown`s it back, which
-  may prompt for `sudo`.
+  emits. Expect a loud `WARNING: ... pom.xml ... is about to be OVERWRITTEN` on every run: the
+  image writes its rendered template over `pom.xml`, which lacks the hand-written test, coverage,
+  javadoc, Maven Central and signing configuration. `make generate_ondewo_protos` therefore saves
+  `pom.xml` before the run and restores it afterwards, and `update_pom_version` writes
+  `ONDEWO_NLU_VERSION` into it. The rendered template is used for one check only: when its
+  toolchain pins (`maven.compiler.release`, `grpc.version`, `protobuf.version`,
+  `google.common.protos.version`) differ from the ones in `pom.xml`, the run fails and prints
+  both, because the stubs were generated for the rendered ones — copy them into `pom.xml`.
+* **The container runs as the invoking user** (`--user`), so nothing it writes is root-owned
+  and no `sudo` is needed. `TEMP_SRC_DIRECTORY` moves the image's scratch copy of the input out
+  of the root-owned `/image-data` to `/tmp`. The scripts in `/image-data` keep the file modes of
+  the submodule checkout, so `build_compiler` makes them world-readable first; under a
+  restrictive umask (`umask 077`) they would otherwise be unreadable for that user.
 * **Generation needs no network** once the image exists: the maven build inside the container
   runs offline against a repository pre-warmed at image-build time.
 
@@ -245,15 +263,15 @@ a regeneration as long as they live in their own package (for example
 
 * Never put a hand-written class in a package that holds generated stubs — it is deleted on the
   next run.
-* Hand-written code must compile against the generated `pom.xml`, i.e. against gRPC, protobuf
-  and the JDK only (`java.net.http` covers HTTP/token work). Extra dependencies require a
-  hand-maintained `pom.xml` mounted at the input-volume root, and every version it names must be
-  one that the compiler image pre-warmed, because the packaging step runs `mvn --offline`.
+* Hand-written code compiles against `pom.xml`, which declares gRPC, protobuf and nothing else at
+  runtime (`java.net.http` covers HTTP/token work). An extra dependency goes into `pom.xml`, which
+  a regeneration keeps; the image's own offline build compiles the generated stubs only.
 
 ## Testing
 
 ```bash
 make test          # check_build + mvn verify (suite + coverage gate)
+make test_via_docker   # the same inside the utils image - needs only Docker
 mvn -B verify      # the same without the submodule-dependent check_build
 ```
 
@@ -278,55 +296,125 @@ run red instead of skipping.
 
 ## Release
 
+A release runs **entirely on a maintainer's machine**, from `make ondewo_release`. CI builds and
+publishes nothing: `.github/workflows/ci.yml` only lints and tests, and there is no other workflow.
+The credentials live **only** in the `ondewo-devops-accounts` repository — never in a GitHub
+repository or organisation secret, and never in a file of this repository. No step needs a human:
+Maven Central publishes the deployment automatically, and the release waits until it has.
+
 Versions are defined once, in the `Makefile`: `ONDEWO_NLU_VERSION` must match the
-`ondewo-nlu-api` release in major and minor version, and is written into the generated `pom.xml` by
-the next `make build`.
+`ondewo-nlu-api` release in major and minor version, and is written into `pom.xml` by
+`make update_pom_version`, which `make build` and `make ondewo_release` both run.
 
 1. Bump `ONDEWO_NLU_VERSION` and the submodule pins in the `Makefile`.
 1. Add the release entry at the top of `RELEASE.md`.
-1. `make ondewo_release` — checks that the branch/tag/pom version are consistent (`spc`), fetches
-   the GitHub and Maven Central credentials from the `ondewo-devops-accounts` repository,
-   rebuilds everything, commits, creates the release branch and tag, publishes the GitHub
-   release with the built jars attached, and uploads the signed deployment to Maven Central.
+1. Run `make ondewo_release` from `master`.
 
-`make release` does the same with credentials taken from the environment
-(`GITHUB_GH_TOKEN=... MAVEN_CENTRAL_USERNAME=... make release`).
+`make release_all_clients` in `ondewo-nlu-api` does all three steps for this client: it clones
+the repository, inserts a generated `RELEASE.md` entry, rewrites the version and the submodule
+pins in the `Makefile`, and runs `make ondewo_release`.
+
+`make ondewo_release` stops at the first failure, and everything that can be checked in advance
+runs before the first push:
+
+1. `update_pom_version`, then `spc`: the release branch and tag must not exist yet, and `pom.xml`
+   must carry the version.
+1. `clone_devops_accounts` + `run_release_with_devops`: reads exactly `GITHUB_GH_TOKEN` from
+   `account_github.env` and `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD`,
+   `MAVEN_GPG_KEY_B64` and `MAVEN_GPG_PASSPHRASE` from `account_maven_central.env` (anchored
+   `^NAME=` matches, so the comment lines of those files never leak in), and hands them to
+   `make release`.
+1. `make release`:
+   1. every credential is set: not empty, not a placeholder (`check_release_credentials`);
+   1. every credential is accepted, proven read-only in the utils image
+      (`validate_release_credentials_via_docker_image`): GitHub reports `permissions.push=true` on
+      this repository for the token; the Central Portal accepts the user token and reports this
+      version as not yet published; the signing key decodes to an ASCII-armoured secret key that
+      signs a probe file with the passphrase;
+   1. `RELEASE.md` has an entry for the version;
+   1. `make build`, the pre-commit hooks, `check_build`, `check_central_pom` and the Maven
+      Central dry run (see below);
+   1. commit, push `master`, then push the branch `release/<version>` and the tag `<version>`;
+   1. the Maven Central deployment (`push_to_maven_central_via_docker`), the only upload there is:
+      signed with the release key, published automatically, and waited for until Central reports
+      it `PUBLISHED`;
+   1. the GitHub release with the release notes, **last** (the jars are distributed by Maven
+      Central). A GitHub release therefore always means the version is complete everywhere.
+
+Every step that needs maven, the JDK, gpg, curl or the GitHub CLI runs in the
+`ondewo-nlu-client-utils-java` image (`Dockerfile.utils`, built by `make build_utils_docker_image`),
+with the repository mounted and as the invoking user, so the release host needs only GNU Make,
+git with ssh access to GitHub and Bitbucket, Docker and perl.
+
+`make release` is the step `run_release_with_devops` calls with those five values; run
+`make ondewo_release`, not `make release`.
+
+### If a release stops after the tag
+
+Once the tag is pushed, `make spc` refuses to run the release again. Look at what exists, then
+run only the step that is still missing:
+
+| Stopped in | What exists | What to do |
+| --- | --- | --- |
+| `push_to_maven_central_via_docker`: failed before the upload, or the Portal rejected the deployment (`FAILED`) | nothing on Maven Central | fix the cause and re-run that step, then the GitHub release step; a defect in the tagged tree needs a new patch version instead |
+| `push_to_maven_central_via_docker`: not `PUBLISHED` within `waitMaxTime` (3600 s) | the Portal may still publish it | wait until `https://repo1.maven.org/maven2/com/ondewo/ondewo-nlu-client-java/<version>/` lists it, then run only the GitHub release step — never upload the version a second time |
+| `release_to_github_via_docker_image` | the version is on Maven Central, no GitHub release | re-run that step |
+
+Both steps take their credentials from `ondewo-devops-accounts`, exactly as
+`run_release_with_devops` does, from the checkout the release left behind:
+
+```bash
+make clone_devops_accounts
+make push_to_maven_central_via_docker $(grep -hE '^(MAVEN_CENTRAL_USERNAME|MAVEN_CENTRAL_PASSWORD|MAVEN_GPG_KEY_B64|MAVEN_GPG_PASSPHRASE)=' ondewo-devops-accounts/account_maven_central.env)
+make release_to_github_via_docker_image $(grep -hE '^GITHUB_GH_TOKEN=' ondewo-devops-accounts/account_github.env)
+rm -rf ondewo-devops-accounts
+```
 
 ## Publishing to Maven Central
 
 The artifact is published to Maven Central through the
-[Sonatype Central Portal](https://central.sonatype.com). Every deployment is uploaded with
-`autoPublish=false`: it is validated and then **waits in the Portal for a human to press
-Publish**. That last step is deliberate, because a published version can never be replaced or
-withdrawn.
+[Sonatype Central Portal](https://central.sonatype.com), by `make release` and nothing else. The
+`release` profile of `pom.xml` sets `autoPublish=true` and `waitUntil=published`: the Portal
+validates the deployment and publishes it without a human, and the upload step returns only once
+Central reports the version `PUBLISHED`. A rejected deployment, or one that is not published within
+`waitMaxTime=3600` seconds, fails the release before the GitHub release is created. A published
+version can never be replaced or withdrawn, which is why everything that can be checked is checked
+before the tag is pushed.
 
 ### What is checked, and when
 
 | When | What |
 | --- | --- |
-| Every push (CI) | `make dry_run_maven_central` — builds with the `release` profile, signs everything with a throwaway key, verifies the signatures, and re-runs the whole build with maven offline. Needs no credential. |
-| Before an upload | `make check_central_pom` — the pom carries every field the Portal validates; `make check_maven_central_credentials` — no credential is still a placeholder. |
-| The upload | `make push_to_maven_central_via_docker` (from a maintainer's machine, credentials from `ondewo-devops-accounts`) **or** `.github/workflows/release.yml` (triggered by the version tag, credentials from the repository's Actions secrets). They are alternatives; use one per release. |
+| Every push (CI) | `mvn verify` on JDK 11 and 21 — the test suite, the coverage gate and the javadoc build. No credential, no signing, no upload. |
+| `make release`, before anything is pushed | `validate_release_credentials_via_docker_image` — the GitHub token may push, the Central user token is accepted and the version is not published yet, the signing key signs with its passphrase. `check_central_pom` — the pom carries every field the Portal validates. `dry_run_maven_central_via_docker` — builds with the `release` profile, signs everything with a throwaway key, verifies the signatures, and re-runs the whole build with maven offline. |
+| The upload | `push_to_maven_central_via_docker` (`mvn -Prelease clean deploy` in the utils image) — the only upload: signs with the release key, uploads, publishes automatically and waits for `PUBLISHED`. |
+
+`make dry_run_maven_central` and `make dry_run_maven_central_via_docker` need no credential and
+can be run at any time.
 
 ### Credentials
 
-Four secrets, stored **twice**: in `ondewo-devops-accounts/account_maven_central.env` for the
-`make` route and as GitHub Actions secrets of this repository for the workflow route. The names
-are identical in both places, and the `Makefile` declares them with `ENTER_HERE_YOUR_...`
-placeholders so an unconfigured machine fails loudly instead of publishing.
+Four values, kept **only** in `ondewo-devops-accounts/account_maven_central.env`. The `Makefile`
+declares them with `ENTER_HERE_YOUR_...` placeholders, so a release without them fails loudly
+instead of publishing.
 
 | Name | What it is | How to obtain it |
 | --- | --- | --- |
 | `MAVEN_CENTRAL_USERNAME` | Username half of a Central Portal **user token** — not the portal login. | [central.sonatype.com/account](https://central.sonatype.com/account) → *Generate User Token*. |
 | `MAVEN_CENTRAL_PASSWORD` | Password half of that same user token. | Same dialog; it is shown once. |
-| `MAVEN_GPG_KEY_B64` | The PGP **secret** key that signs the artifacts, base64 on a single line. | `gpg --armor --export-secret-keys <fingerprint> \| base64 -w0` |
+| `MAVEN_GPG_KEY_B64` | The PGP **secret** key that signs the artifacts, ASCII-armoured, then base64 on a single line. | `gpg --armor --export-secret-keys <fingerprint> \| base64 -w0` |
 | `MAVEN_GPG_PASSPHRASE` | Passphrase of that key. | Chosen when the key is created. |
 
 `MAVEN_GPG_KEY_B64` is base64-encoded because both carriers are strictly one line per variable:
-an `account_*.env` line, and the `make release VAR=...` hand-off in `run_release_with_devops`. It
-is decoded into `MAVEN_GPG_KEY` in the process environment immediately before maven starts and
-is never written to disk. The `bc` signer of `maven-gpg-plugin` reads it from there, so no
-keyring, `gpg` binary or `gpg-agent` has to exist in the runner or the publishing container.
+an `account_*.env` line, and the `make release VAR=...` hand-off in `run_release_with_devops`. For
+the upload it is decoded into `MAVEN_GPG_KEY` in the process environment immediately before maven
+starts and is never written to disk. The `bc` signer of `maven-gpg-plugin` reads it from there, so
+no keyring, `gpg` binary or `gpg-agent` has to exist in the publishing container. Only the
+pre-push key check imports it into a temporary keyring inside its own throwaway utils container,
+and deletes that keyring again.
+
+The GitHub release uses `GITHUB_GH_TOKEN` from `ondewo-devops-accounts/account_github.env`; it
+must be allowed to push to this repository.
 
 ### One-time setup (a human, once)
 
@@ -348,8 +436,6 @@ keyring, `gpg` binary or `gpg-agent` has to exist in the runner or the publishin
    fails validation even though the upload itself succeeded.
 3. **Generate the user token** and store all four values in
    `ondewo-devops-accounts/account_maven_central.env`.
-4. **Add the same four values** as repository secrets under
-   *Settings → Secrets and variables → Actions*.
 
 ## Contributing
 

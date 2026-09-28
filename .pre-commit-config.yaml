@@ -3,7 +3,7 @@
 # Java formatting/linting is NOT wired in here: everything under src/main/java is generated  #
 # by the ondewo-java-proto-compiler image, and reformatting generated code would fight the   #
 # generator on every regeneration. Compilation is the gate that matters and it runs in CI    #
-# (`mvn package`) and via `make test`.                                                       #
+# (`mvn verify`) and via `make test`.                                                        #
 # see https://pre-commit.com/#intro for an introduction to pre-commit                        #
 #############################################################################################
 
@@ -31,7 +31,7 @@ repos:
         args: [ --maxkb=5120 ]
       - id: check-json
       - id: check-yaml
-      - id: check-xml          # validates the generated pom.xml (does NOT reformat it)
+      - id: check-xml          # validates the hand-maintained pom.xml (does NOT reformat it)
       - id: check-merge-conflict
       - id: check-symlinks
       - id: detect-private-key

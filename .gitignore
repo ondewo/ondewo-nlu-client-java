@@ -1,4 +1,4 @@
-# NOTE on generated code: the stubs under src/main/java and the generated pom.xml are
+# NOTE on generated code: the stubs under src/main/java and the hand-maintained pom.xml are
 # deliberately COMMITTED - same convention as the other ONDEWO client SDKs - so the library can
 # be consumed, opened in an IDE and built by JitPack without Docker. Only BUILD OUTPUT and
 # machine-local caches are ignored here.
