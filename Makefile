@@ -48,7 +48,7 @@ ONDEWO_NLU_VERSION=7.1.0
 # every `make build` runs first, so a build can never silently use whatever the submodule
 # happened to be left at.
 ONDEWO_NLU_API_GIT_BRANCH=tags/7.1.0
-ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.1
+ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.2
 
 # From ondewo-devops-accounts/account_github.env at release time (see run_release_with_devops). It
 # must be allowed to push to this repository, which check_gh_token_valid proves before the first push.
