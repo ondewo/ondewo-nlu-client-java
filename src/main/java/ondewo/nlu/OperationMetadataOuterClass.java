@@ -890,6 +890,14 @@ public final class OperationMetadataOuterClass {
        * <code>CHANGE_DATASET_EMBEDDING_MODEL = 13;</code>
        */
       CHANGE_DATASET_EMBEDDING_MODEL(13),
+      /**
+       * <pre>
+       * re-parse of all documents in a dataset
+       * </pre>
+       *
+       * <code>REPARSE_DATASET = 14;</code>
+       */
+      REPARSE_DATASET(14),
       UNRECOGNIZED(-1),
       ;
 
@@ -1014,6 +1022,14 @@ public final class OperationMetadataOuterClass {
        * <code>CHANGE_DATASET_EMBEDDING_MODEL = 13;</code>
        */
       public static final int CHANGE_DATASET_EMBEDDING_MODEL_VALUE = 13;
+      /**
+       * <pre>
+       * re-parse of all documents in a dataset
+       * </pre>
+       *
+       * <code>REPARSE_DATASET = 14;</code>
+       */
+      public static final int REPARSE_DATASET_VALUE = 14;
 
 
       public final int getNumber() {
@@ -1054,6 +1070,7 @@ public final class OperationMetadataOuterClass {
           case 11: return ADD_RAG_CRAWLER_RESULT_TO_DATASET;
           case 12: return REMOVE_RAG_CRAWLER_RESULT_FROM_DATASET;
           case 13: return CHANGE_DATASET_EMBEDDING_MODEL;
+          case 14: return REPARSE_DATASET;
           default: return null;
         }
       }
@@ -5137,7 +5154,7 @@ public final class OperationMetadataOuterClass {
     java.lang.String[] descriptorData = {
       "\n#ondewo/nlu/operation_metadata.proto\022\no" +
       "ndewo.nlu\032\037google/protobuf/timestamp.pro" +
-      "to\"\265\t\n\021OperationMetadata\0224\n\006status\030\001 \001(\016" +
+      "to\"\312\t\n\021OperationMetadata\0224\n\006status\030\001 \001(\016" +
       "2$.ondewo.nlu.OperationMetadata.Status\022\035" +
       "\n\025parent_operation_name\030\002 \001(\t\022\033\n\023sub_ope" +
       "ration_names\030\003 \003(\t\022/\n\013create_time\030\004 \001(\0132" +
@@ -5158,7 +5175,7 @@ public final class OperationMetadataOuterClass {
       "\n\013modified_by\030\026 \001(\t\"g\n\006Status\022\026\n\022STATUS_" +
       "UNSPECIFIED\020\000\022\017\n\013NOT_STARTED\020\001\022\017\n\013IN_PRO" +
       "GRESS\020\002\022\010\n\004DONE\020\003\022\r\n\tCANCELLED\020\004\022\n\n\006FAIL" +
-      "ED\020\005\"\353\002\n\rOperationType\022\036\n\032OPERATION_TYPE" +
+      "ED\020\005\"\200\003\n\rOperationType\022\036\n\032OPERATION_TYPE" +
       "_UNSPECIFIED\020\000\022\020\n\014CREATE_AGENT\020\001\022\020\n\014IMPO" +
       "RT_AGENT\020\002\022\020\n\014EXPORT_AGENT\020\003\022\020\n\014DELETE_A" +
       "GENT\020\004\022\021\n\rRESTORE_AGENT\020\005\022\025\n\021BUILD_AGENT" +
@@ -5167,7 +5184,7 @@ public final class OperationMetadataOuterClass {
       "G_CRAWLER\020\n\022%\n!ADD_RAG_CRAWLER_RESULT_TO" +
       "_DATASET\020\013\022*\n&REMOVE_RAG_CRAWLER_RESULT_" +
       "FROM_DATASET\020\014\022\"\n\036CHANGE_DATASET_EMBEDDI" +
-      "NG_MODEL\020\rb\006proto3"
+      "NG_MODEL\020\r\022\023\n\017REPARSE_DATASET\020\016b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
