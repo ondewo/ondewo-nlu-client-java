@@ -10,7 +10,7 @@
   The compiler image OVERWRITES this file with its freshly rendered template, which does NOT
   contain the four HAND-WRITTEN blocks:
     1. Maven Central metadata  (developers + scm, and the url pointing at THIS repository)
-    2. test dependencies       (junit-jupiter + grpc-inprocess)
+    2. test dependencies       (junit-jupiter + grpc-inprocess + bcpkix)
     3. surefire + jacoco       (the test run and the coverage gate)
     4. javadoc + the release profile (gpg signing + central-publishing)
   So `make generate_ondewo_protos` saves this file before the run and restores it afterwards,
@@ -86,6 +86,9 @@
     <junit.version>5.11.4</junit.version>
     <surefire.version>3.5.4</surefire.version>
     <jacoco.version>0.8.13</jacoco.version>
+    <!-- HAND-WRITTEN. Test only: generates the throwaway PKI of the TLS / mutual-TLS handshake
+         tests at test time, so no private key is ever committed. -->
+    <bouncycastle.version>1.81</bouncycastle.version>
     <!-- HAND-WRITTEN. Publishing toolchain; see block 4 below. -->
     <javadoc.plugin.version>3.12.0</javadoc.plugin.version>
     <gpg.plugin.version>3.2.8</gpg.plugin.version>
@@ -94,6 +97,7 @@
          output, are exercised by the test suite but are not authored logic, and their
          hundreds of thousands of generated lines would drown any real regression. -->
     <handwritten.sources>com/ondewo/nlu/auth/**</handwritten.sources>
+    <handwritten.channel.sources>com/ondewo/nlu/channel/**</handwritten.channel.sources>
   </properties>
 
   <dependencies>
@@ -152,6 +156,13 @@
       <version>${grpc.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Builds the CA, server and client certificates of the real-handshake TLS tests. -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
+      <version>${bouncycastle.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -189,6 +200,7 @@
                counting towards the gate. -->
           <includes>
             <include>${handwritten.sources}</include>
+            <include>${handwritten.channel.sources}</include>
           </includes>
         </configuration>
         <executions>
