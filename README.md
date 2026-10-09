@@ -145,17 +145,18 @@ A minimal call, with the bearer token ONDEWO servers expect attached to every re
 
 ```java
 import com.ondewo.nlu.auth.BearerToken;
+import com.ondewo.nlu.channel.ClientConfig;
+import com.ondewo.nlu.channel.GrpcChannels;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 
 String host = System.getenv("ONDEWO_HOST");
 int port = Integer.parseInt(System.getenv("ONDEWO_PORT"));
 String accessToken = System.getenv("ONDEWO_TOKEN");
 
-ManagedChannel channel = ManagedChannelBuilder
-    .forAddress(host, port)
-    .useTransportSecurity()   // .usePlaintext() for a local, unencrypted server
-    .build();
+// TLS against the JVM trust store; a custom CA, mutual TLS and plaintext are described in
+// "TLS, mutual TLS and certificates" below.
+ManagedChannel channel = GrpcChannels.newChannel(
+    ClientConfig.builder().host(host).port(port).build());
 
 // Replace <Service> with one of the services declared in the ondewo-nlu-api protos.
 <Service>Grpc.<Service>BlockingStub stub = new BearerToken(accessToken)
@@ -165,7 +166,7 @@ ManagedChannel channel = ManagedChannelBuilder
 channel.shutdownNow();
 ```
 
-`BearerToken` is the one hand-written class of this client (see
+`BearerToken` is a hand-written class of this client, like the `channel` package below (see
 [Hand-written code beside the stubs](#hand-written-code-beside-the-stubs)); it wraps the
 `authorization: Bearer <token>` header every ONDEWO server expects. Attaching the header by hand
 with `MetadataUtils.newAttachHeadersInterceptor(...)` works just as well.
@@ -173,6 +174,148 @@ with `MetadataUtils.newAttachHeadersInterceptor(...)` works just as well.
 Note that the protos do not set `java_multiple_files`, so messages are nested inside the outer
 class protoc names after the proto file (`entity_type.proto` → `EntityTypeProto`,
 `agent.proto` → `Agent` or `AgentOuterClass` when a message of the same name exists).
+
+## TLS, mutual TLS and certificates
+
+`com.ondewo.nlu.channel` opens the channel for you: `ClientConfig` holds where to connect and
+the certificate material, `GrpcChannels` turns it into a `ManagedChannel` (or a
+`ManagedChannelBuilder` to add your own settings). Both are hand-written and live outside the
+generated packages, so a regeneration keeps them.
+
+| Mode                           | `useSecureChannel` | Config fields                                                                  |
+|--------------------------------|--------------------|--------------------------------------------------------------------------------|
+| Plaintext (not for production) | `false`            | none                                                                           |
+| TLS, JVM trust store           | `true` (default)   | none                                                                           |
+| TLS, custom CA                 | `true` (default)   | `grpcCert` = PEM of the CA that signed the server certificate                  |
+| Mutual TLS                     | `true` (default)   | `grpcClientCert` and `grpcClientKey`, plus `grpcCert` unless the JVM trusts the server |
+
+Rules the code enforces:
+
+* The three fields hold **PEM content**, **not file paths**. Read the files yourself
+  (`Files.readString(Path.of(...))`). Something that is not PEM - typically a path - makes
+  `GrpcChannels` throw `IllegalArgumentException` before any connection is attempted.
+* `grpcClientCert` and `grpcClientKey` go together: setting only one makes
+  `ClientConfig.Builder.build()` throw `IllegalArgumentException`. Neither set (or both empty)
+  means plain server-authenticated TLS.
+* `useSecureChannel(false)` with a client identity throws `IllegalArgumentException` instead of
+  silently dropping the identity. A plaintext channel logs a `WARNING` naming `host:port`
+  through the `java.util.logging` logger `com.ondewo.nlu.channel.GrpcChannels`; the library never
+  touches your logging configuration.
+* No error message and no `toString()` renders a PEM or the key (see the security notes below).
+* `grpcClientKey` must be an **unencrypted PKCS#8** PEM, which is what `openssl req -newkey ... -nodes`
+  (OpenSSL 3) writes. Convert a traditional EC / RSA key with
+  `openssl pkcs8 -topk8 -nocrypt -in old.key -out client.key`.
+* The server certificate is verified against `grpcCert` (the JVM's default trust store when it is
+  empty), and the host you connect to must match one of the certificate's subject alternative
+  names (SAN). When you connect by an IP the certificate does not list, name the host to check
+  with `overrideAuthority(...)` on the builder.
+* A bare IPv6 literal host is bracketed for you (`::1` → `[::1]:50051`).
+
+```java
+import com.ondewo.nlu.channel.ClientConfig;
+import com.ondewo.nlu.channel.GrpcChannels;
+import io.grpc.ManagedChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+ClientConfig config = ClientConfig.builder()
+    .host("10.0.0.5")
+    .port(50051)
+    .grpcCert(Files.readString(Path.of("certs/ca.pem")))
+    .grpcClientCert(Files.readString(Path.of("certs/client.pem")))   // leave both out for
+    .grpcClientKey(Files.readString(Path.of("certs/client.key")))    // server-authenticated TLS
+    .build();
+
+ManagedChannel channel = GrpcChannels.newChannelBuilder(config)
+    .overrideAuthority("nlu.example.internal")   // only when connecting by an IP the SAN lacks
+    .build();
+```
+
+`GrpcChannels.newChannel(config)` is the short form without extra settings. One channel serves
+every stub of every service of this client: build it once, share it, and shut it down at the end.
+
+### Channel defaults
+
+`GrpcChannels` applies the channel options of the ONDEWO Python clients where grpc-java exposes
+them, and documents where it cannot:
+
+| Python client (grpc-core)                                         | Java client (grpc-java)                                            |
+|-------------------------------------------------------------------|--------------------------------------------------------------------|
+| `keepalive_time_ms=30000`                                         | `keepAliveTime` **5 minutes** - see below                          |
+| `keepalive_timeout_ms=20000`, `http2.ping_timeout_ms=20000`       | `keepAliveTimeout` 20 s: how long grpc-java waits for the ping ack |
+| `keepalive_permit_without_calls=0`                                | `keepAliveWithoutCalls(false)`                                     |
+| `http2.max_pings_without_data=2`                                  | not available in grpc-java                                         |
+| `max_reconnect_backoff_ms=5000`                                   | not available in grpc-java's public API (its default backoff caps at 120 s) |
+| max receive / send message length `2^31-1`                        | `maxInboundMessageSize(Integer.MAX_VALUE)`; grpc-java has no send limit |
+| retry policy for idempotent methods                               | none configured: only gRPC's transparent retries                   |
+
+Why 5 minutes and not 30 seconds: the Python clients stop pinging after two pings without data
+(`http2.max_pings_without_data=2`), and grpc-java has no such limit. A grpc-java client pinging
+every 30 s keeps pinging a stream on which nothing is sent, and a default grpc-core server (every
+ONDEWO Python server) answers the third such ping with a `too_many_pings` GOAWAY - measured
+against a grpcio 1.81 server: a server stream silent for 170 s failed with
+`UNAVAILABLE: Too many pings` after 150 s at 30 s, and one silent for 640 s completed at 5 minutes.
+Five minutes is the ping rate a default grpc-core or grpc-go server accepts without data, so the
+keepalive still detects a dead connection under an active call without ever tearing down a
+healthy one. A server that permits faster pings can be paired with a shorter `keepAliveTime` on
+the builder.
+
+### A test PKI with openssl
+
+A CA, a server certificate with SANs, and a client certificate with the `clientAuth` extended key
+usage. For tests only: the keys are unencrypted.
+
+```bash
+openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 365 \
+  -subj "/CN=Test CA" -keyout ca.key -out ca.pem
+
+printf 'subjectAltName=DNS:localhost,IP:127.0.0.1\nextendedKeyUsage=serverAuth\n' > server.ext
+openssl req -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes \
+  -subj "/CN=localhost" -keyout server.key -out server.csr
+openssl x509 -req -in server.csr -CA ca.pem -CAkey ca.key -CAcreateserial -days 365 \
+  -extfile server.ext -out server.pem
+
+printf 'extendedKeyUsage=clientAuth\n' > client.ext
+openssl req -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes \
+  -subj "/CN=my-client" -keyout client.key -out client.csr
+openssl x509 -req -in client.csr -CA ca.pem -CAkey ca.key -CAcreateserial -days 365 \
+  -extfile client.ext -out client.pem
+
+chmod 600 *.key
+openssl verify -CAfile ca.pem server.pem client.pem
+```
+
+The client then uses `ca.pem` / `client.pem` / `client.key`; a server that requires client
+certificates uses `server.pem` / `server.key` and trusts `ca.pem` for its clients. The test suite
+builds the same PKI in memory at test time (`TestPki`), so no key is ever committed.
+
+### TLS security notes
+
+* `ClientConfig.toString()` shows `grpcClientKey` as `***REDACTED***` (empty when unset) and the
+  certificates only as their length, so logging a config never leaks the key.
+  `getGrpcClientKey()` returns the key in clear text: never log it.
+* `ClientConfig` has no serialized form. Keep the key out of configuration files and source
+  control; load it from a file with mode `0600` or a secret store at startup.
+* `BearerToken` keeps the access token in memory only and does not render it in `toString()`.
+
+### TLS troubleshooting
+
+A failed handshake surfaces as `StatusRuntimeException` with status `UNAVAILABLE` (description
+`ssl exception` or `io exception`); the cause chain names the reason:
+
+* **`PKIX path building failed` / `unable to find valid certification path to requested target`**:
+  `grpcCert` is not the CA that issued the server certificate, the server does not send its
+  intermediate certificates, or `grpcCert` is empty and the JVM trust store does not know the CA.
+* **`No subject alternative names matching IP address ...` / `No name matching ... found`**: the
+  host you connect to is not in the server certificate's SAN. Connect by a name in the SAN, add
+  the SAN, or set `overrideAuthority(...)`.
+* **`TLSV1_ALERT_CERTIFICATE_REQUIRED`** (or another alert) against a server that requires client
+  certificates: no client certificate was presented, or one the server's CA did not issue. Set
+  `grpcClientCert` / `grpcClientKey` to an identity that CA signed.
+* **`IllegalArgumentException: GrpcChannels: could not create the channel to ...`** with the cause
+  `No certificate data found`, `Input stream not contain valid certificates` or
+  `Input stream does not contain valid private key`: a field holds a file path or other non-PEM
+  text, or the key is encrypted or not PKCS#8. Pass `Files.readString(...)` of the PEM file.
 
 ## Repository structure
 
@@ -283,9 +426,12 @@ compiler image and never runs protoc:
 | `com.ondewo.nlu.stubs.GeneratedMessagesTest` | messages of both java flavours (`java_multiple_files` → `com.ondewo.nlu`, outer class → `ondewo.nlu`) survive a serialize/parse round trip, `optional` scalars keep explicit presence on the wire, enums start at their `*_UNSPECIFIED` zero value, and the proto package in the descriptor is untouched by the `java_package` rewrite |
 | `com.ondewo.nlu.stubs.GeneratedServicesTest` | every generated `*Grpc` class (found on the compiled classpath, not listed by hand) exposes a usable `ServiceDescriptor`; a unary call runs end to end over the in-process transport and the real generated marshallers; all three stub flavours build against a plain target channel |
 | `com.ondewo.nlu.auth.BearerTokenTest` | the hand-written `BearerToken` — validation, header shape, stub immutability |
+| `com.ondewo.nlu.channel.ClientConfigTest` | `ClientConfig` validation (host, port, both-or-neither client identity, no identity on plaintext), IPv6 target bracketing, and that neither an error message nor `toString()` renders a PEM or the key |
+| `com.ondewo.nlu.channel.GrpcChannelsTest` | real TLS handshakes against a Netty server on a loopback socket with a PKI generated at test time: TLS with a custom CA, mutual TLS (the server sees the client certificate), CRLF PEMs, IPv6 `[::1]`, empty identity = plain TLS; refused handshakes (no client certificate, client from an unrelated CA, wrong CA, JVM trust store against a test CA) end in `UNAVAILABLE`; plaintext logs a warning naming `host:port`; non-PEM material is refused without being echoed |
+| `com.ondewo.nlu.release.ReleaseNotesTest` | every `RELEASE.md` heading uses the spelling `CURRENT_RELEASE_NOTES` slices, every section ends at its `*****` separator, and the current version has non-empty notes - so a GitHub release is never published without a body |
 
 Coverage is measured with **JaCoCo over the hand-written sources only**
-(`com/ondewo/nlu/auth/**`). Generated stubs are machine output and are excluded from the metric,
+(`com/ondewo/nlu/auth/**` and `com/ondewo/nlu/channel/**`). Generated stubs are machine output and are excluded from the metric,
 but they are exercised by the two test classes above. The gate is bound to `verify` and fails the
 build below **100 %** instruction, branch and method coverage; the HTML report lands in
 `target/site/jacoco/`.
