@@ -372,7 +372,9 @@ create_release_tag: ## Create Release Tag and push it to origin
 check_gh_token: ## Fail loudly when GITHUB_GH_TOKEN is unset or still the placeholder
 # Without this, an unset token reaches `gh auth login --with-token` as an empty stdin and the
 # failure surfaces only in push_to_gh - after create_release_tag has already pushed the tag.
-	@if [ -z "${GITHUB_GH_TOKEN}" ] || [ "${GITHUB_GH_TOKEN}" = "ENTER_YOUR_TOKEN_HERE" ]; then \
+# `$$GITHUB_GH_TOKEN`, not `${GITHUB_GH_TOKEN}`: make expands the latter BEFORE the shell runs, which
+# puts the token on the argv of `sh -c`, and /proc/<pid>/cmdline is readable by every user on the host.
+	@if [ -z "$$GITHUB_GH_TOKEN" ] || [ "$$GITHUB_GH_TOKEN" = "ENTER_YOUR_TOKEN_HERE" ]; then \
 		echo "$(RED)[ERROR]$(NC) GITHUB_GH_TOKEN is not set - use 'make ondewo_release', which reads ${DEVOPS_ACCOUNT_GIT}/account_github.env"; \
 		exit 1; \
 	fi
@@ -391,7 +393,8 @@ check_gh_token_valid: check_gh_token ## Assert GitHub accepts GITHUB_GH_TOKEN an
 	@echo "$(GREEN)[SUCCESS]$(NC) GitHub accepts GITHUB_GH_TOKEN and it may push to ${GH_REPO_PATH}"
 
 login_to_gh: check_gh_token ## Login to Github CLI with Access Token
-	@echo "${GITHUB_GH_TOKEN}" | gh auth login -p ssh --with-token
+# The token reaches gh on stdin, expanded by the shell from the environment (echo is a builtin).
+	@echo "$$GITHUB_GH_TOKEN" | gh auth login -p ssh --with-token
 
 check_release_notes: ## Assert RELEASE.md carries an entry for ONDEWO_NLU_VERSION
 # `gh release create -n ""` succeeds and publishes an EMPTY release, so an entry that was
@@ -612,15 +615,18 @@ clone_devops_accounts: ## Clones devops-accounts repo
 run_release_with_devops: ## Gets Credentials from devops-repo and run release command with them
 # Exactly the five variables this client needs, each matched as `^NAME=` - ANCHORED, because the
 # account_*.env files open with '#' comment lines that mention the same names (the comments of
-# account_maven_central.env name MAVEN_GPG_KEY_B64 twice). An unanchored grep hands such a comment
-# to the `make release` line below, where its '#' comments out every credential after it.
+# account_maven_central.env name MAVEN_GPG_KEY_B64 twice).
 # Every account_*.env line is a single VAR=VALUE: that is why the signing key is carried
 # base64-encoded (MAVEN_GPG_KEY_B64) - a multi-line armored key could not survive this hand-off.
-# The whole `make release` line is @-prefixed so the values are never echoed.
-	$(eval info:= $(shell grep -hE '^GITHUB_GH_TOKEN=' ${DEVOPS_ACCOUNT_DIR}/account_github.env; \
-		grep -hE '^(MAVEN_CENTRAL_USERNAME|MAVEN_CENTRAL_PASSWORD|MAVEN_GPG_KEY_B64|MAVEN_GPG_PASSPHRASE)=' \
-			${DEVOPS_ACCOUNT_DIR}/account_maven_central.env))
-	@make release $(info)
+# The values are exported into the ENVIRONMENT of the sub-make (`set -a`), never passed as
+# `make release NAME=<value>`: make's argv - like every argv - is world-readable in
+# /proc/<pid>/cmdline. Below, docker gets them with bare `-e NAME` forwards for the same reason.
+	@set -a \
+		&& eval "$$(grep -hE '^GITHUB_GH_TOKEN=' ${DEVOPS_ACCOUNT_DIR}/account_github.env; \
+			grep -hE '^(MAVEN_CENTRAL_USERNAME|MAVEN_CENTRAL_PASSWORD|MAVEN_GPG_KEY_B64|MAVEN_GPG_PASSPHRASE)=' \
+				${DEVOPS_ACCOUNT_DIR}/account_maven_central.env)" \
+		&& set +a \
+		&& $(MAKE) release
 
 spc: ## Checks if the Release Branch, Tag and pom.xml version already exist
 	$(eval filtered_branches:= $(shell git branch --all | grep "release/${ONDEWO_NLU_VERSION}"))
