@@ -43,6 +43,7 @@ private static final long serialVersionUID = 0L;
     toolsUsed_ = java.util.Collections.emptyList();
     finishReasonDistribution_ = java.util.Collections.emptyList();
     reasoningEffortDistribution_ = java.util.Collections.emptyList();
+    baseUrlsUsed_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -845,6 +846,77 @@ private static final long serialVersionUID = 0L;
     return safetyStats_ == null ? com.ondewo.nlu.LlmSafetyStats.getDefaultInstance() : safetyStats_;
   }
 
+  public static final int BASE_URLS_USED_FIELD_NUMBER = 21;
+  @SuppressWarnings("serial")
+  private java.util.List<com.ondewo.nlu.LlmBaseUrlUsage> baseUrlsUsed_;
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  @java.lang.Override
+  public java.util.List<com.ondewo.nlu.LlmBaseUrlUsage> getBaseUrlsUsedList() {
+    return baseUrlsUsed_;
+  }
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends com.ondewo.nlu.LlmBaseUrlUsageOrBuilder> 
+      getBaseUrlsUsedOrBuilderList() {
+    return baseUrlsUsed_;
+  }
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  @java.lang.Override
+  public int getBaseUrlsUsedCount() {
+    return baseUrlsUsed_.size();
+  }
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  @java.lang.Override
+  public com.ondewo.nlu.LlmBaseUrlUsage getBaseUrlsUsed(int index) {
+    return baseUrlsUsed_.get(index);
+  }
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  @java.lang.Override
+  public com.ondewo.nlu.LlmBaseUrlUsageOrBuilder getBaseUrlsUsedOrBuilder(
+      int index) {
+    return baseUrlsUsed_.get(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -918,6 +990,9 @@ private static final long serialVersionUID = 0L;
     }
     if (((bitField0_ & 0x00000010) != 0)) {
       output.writeMessage(20, getSafetyStats());
+    }
+    for (int i = 0; i < baseUrlsUsed_.size(); i++) {
+      output.writeMessage(21, baseUrlsUsed_.get(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -1008,6 +1083,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(20, getSafetyStats());
     }
+    for (int i = 0; i < baseUrlsUsed_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(21, baseUrlsUsed_.get(i));
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -1081,6 +1160,8 @@ private static final long serialVersionUID = 0L;
       if (!getSafetyStats()
           .equals(other.getSafetyStats())) return false;
     }
+    if (!getBaseUrlsUsedList()
+        .equals(other.getBaseUrlsUsedList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -1162,6 +1243,10 @@ private static final long serialVersionUID = 0L;
     if (hasSafetyStats()) {
       hash = (37 * hash) + SAFETY_STATS_FIELD_NUMBER;
       hash = (53 * hash) + getSafetyStats().hashCode();
+    }
+    if (getBaseUrlsUsedCount() > 0) {
+      hash = (37 * hash) + BASE_URLS_USED_FIELD_NUMBER;
+      hash = (53 * hash) + getBaseUrlsUsedList().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -1313,6 +1398,7 @@ private static final long serialVersionUID = 0L;
         internalGetFinishReasonDistributionFieldBuilder();
         internalGetReasoningEffortDistributionFieldBuilder();
         internalGetSafetyStatsFieldBuilder();
+        internalGetBaseUrlsUsedFieldBuilder();
       }
     }
     @java.lang.Override
@@ -1407,6 +1493,13 @@ private static final long serialVersionUID = 0L;
         safetyStatsBuilder_.dispose();
         safetyStatsBuilder_ = null;
       }
+      if (baseUrlsUsedBuilder_ == null) {
+        baseUrlsUsed_ = java.util.Collections.emptyList();
+      } else {
+        baseUrlsUsed_ = null;
+        baseUrlsUsedBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00100000);
       return this;
     }
 
@@ -1511,6 +1604,15 @@ private static final long serialVersionUID = 0L;
         result.reasoningEffortDistribution_ = reasoningEffortDistribution_;
       } else {
         result.reasoningEffortDistribution_ = reasoningEffortDistributionBuilder_.build();
+      }
+      if (baseUrlsUsedBuilder_ == null) {
+        if (((bitField0_ & 0x00100000) != 0)) {
+          baseUrlsUsed_ = java.util.Collections.unmodifiableList(baseUrlsUsed_);
+          bitField0_ = (bitField0_ & ~0x00100000);
+        }
+        result.baseUrlsUsed_ = baseUrlsUsed_;
+      } else {
+        result.baseUrlsUsed_ = baseUrlsUsedBuilder_.build();
       }
     }
 
@@ -1827,6 +1929,32 @@ private static final long serialVersionUID = 0L;
       if (other.hasSafetyStats()) {
         mergeSafetyStats(other.getSafetyStats());
       }
+      if (baseUrlsUsedBuilder_ == null) {
+        if (!other.baseUrlsUsed_.isEmpty()) {
+          if (baseUrlsUsed_.isEmpty()) {
+            baseUrlsUsed_ = other.baseUrlsUsed_;
+            bitField0_ = (bitField0_ & ~0x00100000);
+          } else {
+            ensureBaseUrlsUsedIsMutable();
+            baseUrlsUsed_.addAll(other.baseUrlsUsed_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.baseUrlsUsed_.isEmpty()) {
+          if (baseUrlsUsedBuilder_.isEmpty()) {
+            baseUrlsUsedBuilder_.dispose();
+            baseUrlsUsedBuilder_ = null;
+            baseUrlsUsed_ = other.baseUrlsUsed_;
+            bitField0_ = (bitField0_ & ~0x00100000);
+            baseUrlsUsedBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 internalGetBaseUrlsUsedFieldBuilder() : null;
+          } else {
+            baseUrlsUsedBuilder_.addAllMessages(other.baseUrlsUsed_);
+          }
+        }
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -2027,6 +2155,19 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00080000;
               break;
             } // case 162
+            case 170: {
+              com.ondewo.nlu.LlmBaseUrlUsage m =
+                  input.readMessage(
+                      com.ondewo.nlu.LlmBaseUrlUsage.parser(),
+                      extensionRegistry);
+              if (baseUrlsUsedBuilder_ == null) {
+                ensureBaseUrlsUsedIsMutable();
+                baseUrlsUsed_.add(m);
+              } else {
+                baseUrlsUsedBuilder_.addMessage(m);
+              }
+              break;
+            } // case 170
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -5640,6 +5781,354 @@ private static final long serialVersionUID = 0L;
         safetyStats_ = null;
       }
       return safetyStatsBuilder_;
+    }
+
+    private java.util.List<com.ondewo.nlu.LlmBaseUrlUsage> baseUrlsUsed_ =
+      java.util.Collections.emptyList();
+    private void ensureBaseUrlsUsedIsMutable() {
+      if (!((bitField0_ & 0x00100000) != 0)) {
+        baseUrlsUsed_ = new java.util.ArrayList<com.ondewo.nlu.LlmBaseUrlUsage>(baseUrlsUsed_);
+        bitField0_ |= 0x00100000;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.ondewo.nlu.LlmBaseUrlUsage, com.ondewo.nlu.LlmBaseUrlUsage.Builder, com.ondewo.nlu.LlmBaseUrlUsageOrBuilder> baseUrlsUsedBuilder_;
+
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public java.util.List<com.ondewo.nlu.LlmBaseUrlUsage> getBaseUrlsUsedList() {
+      if (baseUrlsUsedBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(baseUrlsUsed_);
+      } else {
+        return baseUrlsUsedBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public int getBaseUrlsUsedCount() {
+      if (baseUrlsUsedBuilder_ == null) {
+        return baseUrlsUsed_.size();
+      } else {
+        return baseUrlsUsedBuilder_.getCount();
+      }
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public com.ondewo.nlu.LlmBaseUrlUsage getBaseUrlsUsed(int index) {
+      if (baseUrlsUsedBuilder_ == null) {
+        return baseUrlsUsed_.get(index);
+      } else {
+        return baseUrlsUsedBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder setBaseUrlsUsed(
+        int index, com.ondewo.nlu.LlmBaseUrlUsage value) {
+      if (baseUrlsUsedBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.set(index, value);
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder setBaseUrlsUsed(
+        int index, com.ondewo.nlu.LlmBaseUrlUsage.Builder builderForValue) {
+      if (baseUrlsUsedBuilder_ == null) {
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder addBaseUrlsUsed(com.ondewo.nlu.LlmBaseUrlUsage value) {
+      if (baseUrlsUsedBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.add(value);
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder addBaseUrlsUsed(
+        int index, com.ondewo.nlu.LlmBaseUrlUsage value) {
+      if (baseUrlsUsedBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.add(index, value);
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder addBaseUrlsUsed(
+        com.ondewo.nlu.LlmBaseUrlUsage.Builder builderForValue) {
+      if (baseUrlsUsedBuilder_ == null) {
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.add(builderForValue.build());
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder addBaseUrlsUsed(
+        int index, com.ondewo.nlu.LlmBaseUrlUsage.Builder builderForValue) {
+      if (baseUrlsUsedBuilder_ == null) {
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder addAllBaseUrlsUsed(
+        java.lang.Iterable<? extends com.ondewo.nlu.LlmBaseUrlUsage> values) {
+      if (baseUrlsUsedBuilder_ == null) {
+        ensureBaseUrlsUsedIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, baseUrlsUsed_);
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder clearBaseUrlsUsed() {
+      if (baseUrlsUsedBuilder_ == null) {
+        baseUrlsUsed_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00100000);
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public Builder removeBaseUrlsUsed(int index) {
+      if (baseUrlsUsedBuilder_ == null) {
+        ensureBaseUrlsUsedIsMutable();
+        baseUrlsUsed_.remove(index);
+        onChanged();
+      } else {
+        baseUrlsUsedBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public com.ondewo.nlu.LlmBaseUrlUsage.Builder getBaseUrlsUsedBuilder(
+        int index) {
+      return internalGetBaseUrlsUsedFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public com.ondewo.nlu.LlmBaseUrlUsageOrBuilder getBaseUrlsUsedOrBuilder(
+        int index) {
+      if (baseUrlsUsedBuilder_ == null) {
+        return baseUrlsUsed_.get(index);  } else {
+        return baseUrlsUsedBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public java.util.List<? extends com.ondewo.nlu.LlmBaseUrlUsageOrBuilder> 
+         getBaseUrlsUsedOrBuilderList() {
+      if (baseUrlsUsedBuilder_ != null) {
+        return baseUrlsUsedBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(baseUrlsUsed_);
+      }
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public com.ondewo.nlu.LlmBaseUrlUsage.Builder addBaseUrlsUsedBuilder() {
+      return internalGetBaseUrlsUsedFieldBuilder().addBuilder(
+          com.ondewo.nlu.LlmBaseUrlUsage.getDefaultInstance());
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public com.ondewo.nlu.LlmBaseUrlUsage.Builder addBaseUrlsUsedBuilder(
+        int index) {
+      return internalGetBaseUrlsUsedFieldBuilder().addBuilder(
+          index, com.ondewo.nlu.LlmBaseUrlUsage.getDefaultInstance());
+    }
+    /**
+     * <pre>
+     * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+     * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+     * distinct base URL in scope.
+     * </pre>
+     *
+     * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+     */
+    public java.util.List<com.ondewo.nlu.LlmBaseUrlUsage.Builder> 
+         getBaseUrlsUsedBuilderList() {
+      return internalGetBaseUrlsUsedFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        com.ondewo.nlu.LlmBaseUrlUsage, com.ondewo.nlu.LlmBaseUrlUsage.Builder, com.ondewo.nlu.LlmBaseUrlUsageOrBuilder> 
+        internalGetBaseUrlsUsedFieldBuilder() {
+      if (baseUrlsUsedBuilder_ == null) {
+        baseUrlsUsedBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            com.ondewo.nlu.LlmBaseUrlUsage, com.ondewo.nlu.LlmBaseUrlUsage.Builder, com.ondewo.nlu.LlmBaseUrlUsageOrBuilder>(
+                baseUrlsUsed_,
+                ((bitField0_ & 0x00100000) != 0),
+                getParentForChildren(),
+                isClean());
+        baseUrlsUsed_ = null;
+      }
+      return baseUrlsUsedBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:ondewo.nlu.LlmTelemetryReport)

@@ -64,6 +64,7 @@ private static final long serialVersionUID = 0L;
     LLM_TOOL_CALL_FINISHED(8),
     LLM_THINKING_DELTA(9),
     LLM_TOKEN_USAGE_UPDATE(10),
+    LLM_AGENT_NODE_EVENT(11),
     TELEMETRYEVENT_NOT_SET(0);
     private final int value;
     private TelemetryEventCase(int value) {
@@ -87,6 +88,7 @@ private static final long serialVersionUID = 0L;
         case 8: return LLM_TOOL_CALL_FINISHED;
         case 9: return LLM_THINKING_DELTA;
         case 10: return LLM_TOKEN_USAGE_UPDATE;
+        case 11: return LLM_AGENT_NODE_EVENT;
         case 0: return TELEMETRYEVENT_NOT_SET;
         default: return null;
       }
@@ -523,6 +525,49 @@ private static final long serialVersionUID = 0L;
     return com.ondewo.nlu.LlmTokenUsageUpdateEvent.getDefaultInstance();
   }
 
+  public static final int LLM_AGENT_NODE_EVENT_FIELD_NUMBER = 11;
+  /**
+   * <pre>
+   * Emitted when a node of an AI Team graph starts, completes or fails.
+   * </pre>
+   *
+   * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+   * @return Whether the llmAgentNodeEvent field is set.
+   */
+  @java.lang.Override
+  public boolean hasLlmAgentNodeEvent() {
+    return telemetryEventCase_ == 11;
+  }
+  /**
+   * <pre>
+   * Emitted when a node of an AI Team graph starts, completes or fails.
+   * </pre>
+   *
+   * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+   * @return The llmAgentNodeEvent.
+   */
+  @java.lang.Override
+  public com.ondewo.nlu.LlmAgentNodeEvent getLlmAgentNodeEvent() {
+    if (telemetryEventCase_ == 11) {
+       return (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_;
+    }
+    return com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance();
+  }
+  /**
+   * <pre>
+   * Emitted when a node of an AI Team graph starts, completes or fails.
+   * </pre>
+   *
+   * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+   */
+  @java.lang.Override
+  public com.ondewo.nlu.LlmAgentNodeEventOrBuilder getLlmAgentNodeEventOrBuilder() {
+    if (telemetryEventCase_ == 11) {
+       return (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_;
+    }
+    return com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -566,6 +611,9 @@ private static final long serialVersionUID = 0L;
     }
     if (telemetryEventCase_ == 10) {
       output.writeMessage(10, (com.ondewo.nlu.LlmTokenUsageUpdateEvent) telemetryEvent_);
+    }
+    if (telemetryEventCase_ == 11) {
+      output.writeMessage(11, (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -614,6 +662,10 @@ private static final long serialVersionUID = 0L;
     if (telemetryEventCase_ == 10) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(10, (com.ondewo.nlu.LlmTokenUsageUpdateEvent) telemetryEvent_);
+    }
+    if (telemetryEventCase_ == 11) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(11, (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -673,6 +725,10 @@ private static final long serialVersionUID = 0L;
         if (!getLlmTokenUsageUpdate()
             .equals(other.getLlmTokenUsageUpdate())) return false;
         break;
+      case 11:
+        if (!getLlmAgentNodeEvent()
+            .equals(other.getLlmAgentNodeEvent())) return false;
+        break;
       case 0:
       default:
     }
@@ -725,6 +781,10 @@ private static final long serialVersionUID = 0L;
       case 10:
         hash = (37 * hash) + LLM_TOKEN_USAGE_UPDATE_FIELD_NUMBER;
         hash = (53 * hash) + getLlmTokenUsageUpdate().hashCode();
+        break;
+      case 11:
+        hash = (37 * hash) + LLM_AGENT_NODE_EVENT_FIELD_NUMBER;
+        hash = (53 * hash) + getLlmAgentNodeEvent().hashCode();
         break;
       case 0:
       default:
@@ -909,6 +969,9 @@ private static final long serialVersionUID = 0L;
       if (llmTokenUsageUpdateBuilder_ != null) {
         llmTokenUsageUpdateBuilder_.clear();
       }
+      if (llmAgentNodeEventBuilder_ != null) {
+        llmAgentNodeEventBuilder_.clear();
+      }
       telemetryEventCase_ = 0;
       telemetryEvent_ = null;
       return this;
@@ -997,6 +1060,10 @@ private static final long serialVersionUID = 0L;
           llmTokenUsageUpdateBuilder_ != null) {
         result.telemetryEvent_ = llmTokenUsageUpdateBuilder_.build();
       }
+      if (telemetryEventCase_ == 11 &&
+          llmAgentNodeEventBuilder_ != null) {
+        result.telemetryEvent_ = llmAgentNodeEventBuilder_.build();
+      }
     }
 
     @java.lang.Override
@@ -1048,6 +1115,10 @@ private static final long serialVersionUID = 0L;
         }
         case LLM_TOKEN_USAGE_UPDATE: {
           mergeLlmTokenUsageUpdate(other.getLlmTokenUsageUpdate());
+          break;
+        }
+        case LLM_AGENT_NODE_EVENT: {
+          mergeLlmAgentNodeEvent(other.getLlmAgentNodeEvent());
           break;
         }
         case TELEMETRYEVENT_NOT_SET: {
@@ -1148,6 +1219,13 @@ private static final long serialVersionUID = 0L;
               telemetryEventCase_ = 10;
               break;
             } // case 82
+            case 90: {
+              input.readMessage(
+                  internalGetLlmAgentNodeEventFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              telemetryEventCase_ = 11;
+              break;
+            } // case 90
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -2814,6 +2892,184 @@ private static final long serialVersionUID = 0L;
       telemetryEventCase_ = 10;
       onChanged();
       return llmTokenUsageUpdateBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilder<
+        com.ondewo.nlu.LlmAgentNodeEvent, com.ondewo.nlu.LlmAgentNodeEvent.Builder, com.ondewo.nlu.LlmAgentNodeEventOrBuilder> llmAgentNodeEventBuilder_;
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     * @return Whether the llmAgentNodeEvent field is set.
+     */
+    @java.lang.Override
+    public boolean hasLlmAgentNodeEvent() {
+      return telemetryEventCase_ == 11;
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     * @return The llmAgentNodeEvent.
+     */
+    @java.lang.Override
+    public com.ondewo.nlu.LlmAgentNodeEvent getLlmAgentNodeEvent() {
+      if (llmAgentNodeEventBuilder_ == null) {
+        if (telemetryEventCase_ == 11) {
+          return (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_;
+        }
+        return com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance();
+      } else {
+        if (telemetryEventCase_ == 11) {
+          return llmAgentNodeEventBuilder_.getMessage();
+        }
+        return com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance();
+      }
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    public Builder setLlmAgentNodeEvent(com.ondewo.nlu.LlmAgentNodeEvent value) {
+      if (llmAgentNodeEventBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        telemetryEvent_ = value;
+        onChanged();
+      } else {
+        llmAgentNodeEventBuilder_.setMessage(value);
+      }
+      telemetryEventCase_ = 11;
+      return this;
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    public Builder setLlmAgentNodeEvent(
+        com.ondewo.nlu.LlmAgentNodeEvent.Builder builderForValue) {
+      if (llmAgentNodeEventBuilder_ == null) {
+        telemetryEvent_ = builderForValue.build();
+        onChanged();
+      } else {
+        llmAgentNodeEventBuilder_.setMessage(builderForValue.build());
+      }
+      telemetryEventCase_ = 11;
+      return this;
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    public Builder mergeLlmAgentNodeEvent(com.ondewo.nlu.LlmAgentNodeEvent value) {
+      if (llmAgentNodeEventBuilder_ == null) {
+        if (telemetryEventCase_ == 11 &&
+            telemetryEvent_ != com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance()) {
+          telemetryEvent_ = com.ondewo.nlu.LlmAgentNodeEvent.newBuilder((com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          telemetryEvent_ = value;
+        }
+        onChanged();
+      } else {
+        if (telemetryEventCase_ == 11) {
+          llmAgentNodeEventBuilder_.mergeFrom(value);
+        } else {
+          llmAgentNodeEventBuilder_.setMessage(value);
+        }
+      }
+      telemetryEventCase_ = 11;
+      return this;
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    public Builder clearLlmAgentNodeEvent() {
+      if (llmAgentNodeEventBuilder_ == null) {
+        if (telemetryEventCase_ == 11) {
+          telemetryEventCase_ = 0;
+          telemetryEvent_ = null;
+          onChanged();
+        }
+      } else {
+        if (telemetryEventCase_ == 11) {
+          telemetryEventCase_ = 0;
+          telemetryEvent_ = null;
+        }
+        llmAgentNodeEventBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    public com.ondewo.nlu.LlmAgentNodeEvent.Builder getLlmAgentNodeEventBuilder() {
+      return internalGetLlmAgentNodeEventFieldBuilder().getBuilder();
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    @java.lang.Override
+    public com.ondewo.nlu.LlmAgentNodeEventOrBuilder getLlmAgentNodeEventOrBuilder() {
+      if ((telemetryEventCase_ == 11) && (llmAgentNodeEventBuilder_ != null)) {
+        return llmAgentNodeEventBuilder_.getMessageOrBuilder();
+      } else {
+        if (telemetryEventCase_ == 11) {
+          return (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_;
+        }
+        return com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance();
+      }
+    }
+    /**
+     * <pre>
+     * Emitted when a node of an AI Team graph starts, completes or fails.
+     * </pre>
+     *
+     * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilder<
+        com.ondewo.nlu.LlmAgentNodeEvent, com.ondewo.nlu.LlmAgentNodeEvent.Builder, com.ondewo.nlu.LlmAgentNodeEventOrBuilder> 
+        internalGetLlmAgentNodeEventFieldBuilder() {
+      if (llmAgentNodeEventBuilder_ == null) {
+        if (!(telemetryEventCase_ == 11)) {
+          telemetryEvent_ = com.ondewo.nlu.LlmAgentNodeEvent.getDefaultInstance();
+        }
+        llmAgentNodeEventBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+            com.ondewo.nlu.LlmAgentNodeEvent, com.ondewo.nlu.LlmAgentNodeEvent.Builder, com.ondewo.nlu.LlmAgentNodeEventOrBuilder>(
+                (com.ondewo.nlu.LlmAgentNodeEvent) telemetryEvent_,
+                getParentForChildren(),
+                isClean());
+        telemetryEvent_ = null;
+      }
+      telemetryEventCase_ = 11;
+      onChanged();
+      return llmAgentNodeEventBuilder_;
     }
 
     // @@protoc_insertion_point(builder_scope:ondewo.nlu.StreamingDetectIntentResponse)

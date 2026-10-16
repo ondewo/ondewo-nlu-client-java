@@ -42,13 +42,13 @@ export
 
 # MUST BE THE SAME AS THE API in Major and Minor Version Number
 # example: API 2.9.0 --> Client 2.9.X
-ONDEWO_NLU_VERSION=7.3.1
+ONDEWO_NLU_VERSION=7.4.0
 
 # Submodule pins. Both are checked out by `make checkout_defined_submodule_versions`, which
 # every `make build` runs first, so a build can never silently use whatever the submodule
 # happened to be left at.
-ONDEWO_NLU_API_GIT_BRANCH=tags/7.3.0
-ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.2
+ONDEWO_NLU_API_GIT_BRANCH=tags/7.4.0
+ONDEWO_PROTO_COMPILER_GIT_BRANCH=tags/5.15.7
 
 # From ondewo-devops-accounts/account_github.env at release time (see run_release_with_devops). It
 # must be allowed to push to this repository, which check_gh_token_valid proves before the first push.

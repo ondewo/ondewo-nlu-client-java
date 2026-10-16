@@ -275,5 +275,32 @@ public interface StreamingDetectIntentResponseOrBuilder extends
    */
   com.ondewo.nlu.LlmTokenUsageUpdateEventOrBuilder getLlmTokenUsageUpdateOrBuilder();
 
+  /**
+   * <pre>
+   * Emitted when a node of an AI Team graph starts, completes or fails.
+   * </pre>
+   *
+   * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+   * @return Whether the llmAgentNodeEvent field is set.
+   */
+  boolean hasLlmAgentNodeEvent();
+  /**
+   * <pre>
+   * Emitted when a node of an AI Team graph starts, completes or fails.
+   * </pre>
+   *
+   * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+   * @return The llmAgentNodeEvent.
+   */
+  com.ondewo.nlu.LlmAgentNodeEvent getLlmAgentNodeEvent();
+  /**
+   * <pre>
+   * Emitted when a node of an AI Team graph starts, completes or fails.
+   * </pre>
+   *
+   * <code>.ondewo.nlu.LlmAgentNodeEvent llm_agent_node_event = 11;</code>
+   */
+  com.ondewo.nlu.LlmAgentNodeEventOrBuilder getLlmAgentNodeEventOrBuilder();
+
   com.ondewo.nlu.StreamingDetectIntentResponse.TelemetryEventCase getTelemetryEventCase();
 }

@@ -153,7 +153,7 @@ public enum FeedbackAuthorType
   }
   public static com.google.protobuf.Descriptors.EnumDescriptor
       getDescriptor() {
-    return com.ondewo.nlu.SessionProto.getDescriptor().getEnumTypes().get(6);
+    return com.ondewo.nlu.SessionProto.getDescriptor().getEnumTypes().get(7);
   }
 
   private static final FeedbackAuthorType[] VALUES = values();

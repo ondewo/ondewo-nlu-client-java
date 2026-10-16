@@ -151,7 +151,7 @@ public enum AudioFileResourceType
   }
   public static com.google.protobuf.Descriptors.EnumDescriptor
       getDescriptor() {
-    return com.ondewo.nlu.SessionProto.getDescriptor().getEnumTypes().get(10);
+    return com.ondewo.nlu.SessionProto.getDescriptor().getEnumTypes().get(11);
   }
 
   private static final AudioFileResourceType[] VALUES = values();

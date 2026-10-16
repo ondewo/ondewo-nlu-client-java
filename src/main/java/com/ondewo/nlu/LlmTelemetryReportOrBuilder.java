@@ -569,4 +569,58 @@ public interface LlmTelemetryReportOrBuilder extends
    * <code>.ondewo.nlu.LlmSafetyStats safety_stats = 20;</code>
    */
   com.ondewo.nlu.LlmSafetyStatsOrBuilder getSafetyStatsOrBuilder();
+
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  java.util.List<com.ondewo.nlu.LlmBaseUrlUsage> 
+      getBaseUrlsUsedList();
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  com.ondewo.nlu.LlmBaseUrlUsage getBaseUrlsUsed(int index);
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  int getBaseUrlsUsedCount();
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  java.util.List<? extends com.ondewo.nlu.LlmBaseUrlUsageOrBuilder> 
+      getBaseUrlsUsedOrBuilderList();
+  /**
+   * <pre>
+   * Per-base-URL usage rollup. Populated for *_LLM_TOTAL_STATISTICS. Unlike
+   * &lt;code&gt;LlmModelUsage.base_url&lt;/code&gt;, which carries one base URL per model, this lists every
+   * distinct base URL in scope.
+   * </pre>
+   *
+   * <code>repeated .ondewo.nlu.LlmBaseUrlUsage base_urls_used = 21;</code>
+   */
+  com.ondewo.nlu.LlmBaseUrlUsageOrBuilder getBaseUrlsUsedOrBuilder(
+      int index);
 }
