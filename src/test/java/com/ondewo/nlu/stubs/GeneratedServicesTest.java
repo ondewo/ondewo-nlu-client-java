@@ -40,11 +40,11 @@ import org.junit.jupiter.api.Test;
 class GeneratedServicesTest {
 
     /**
-     * Number of {@code *Grpc} classes protoc must emit for this product: 16 services in
+     * Number of {@code *Grpc} classes protoc must emit for this product: 17 services in
      * ondewo/nlu/*.proto plus ondewo.qa.QA. Bump it when the api adds or drops a service -
      * that is exactly the kind of silent generator regression this test exists to catch.
      */
-    private static final int EXPECTED_SERVICE_COUNT = 17;
+    private static final int EXPECTED_SERVICE_COUNT = 18;
 
     private static final Metadata.Key<String> AUTHORIZATION =
             Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER);

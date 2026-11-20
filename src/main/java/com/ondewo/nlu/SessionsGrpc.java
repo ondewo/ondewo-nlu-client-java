@@ -77,6 +77,99 @@ public final class SessionsGrpc {
     return getStreamingDetectIntentMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.InterruptTurnRequest,
+      com.ondewo.nlu.InterruptTurnResponse> getInterruptTurnMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "InterruptTurn",
+      requestType = com.ondewo.nlu.InterruptTurnRequest.class,
+      responseType = com.ondewo.nlu.InterruptTurnResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.InterruptTurnRequest,
+      com.ondewo.nlu.InterruptTurnResponse> getInterruptTurnMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.InterruptTurnRequest, com.ondewo.nlu.InterruptTurnResponse> getInterruptTurnMethod;
+    if ((getInterruptTurnMethod = SessionsGrpc.getInterruptTurnMethod) == null) {
+      synchronized (SessionsGrpc.class) {
+        if ((getInterruptTurnMethod = SessionsGrpc.getInterruptTurnMethod) == null) {
+          SessionsGrpc.getInterruptTurnMethod = getInterruptTurnMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.InterruptTurnRequest, com.ondewo.nlu.InterruptTurnResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "InterruptTurn"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.InterruptTurnRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.InterruptTurnResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new SessionsMethodDescriptorSupplier("InterruptTurn"))
+              .build();
+        }
+      }
+    }
+    return getInterruptTurnMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.PrepareWarmTransferIntroRequest,
+      com.ondewo.nlu.PrepareWarmTransferIntroResponse> getPrepareWarmTransferIntroMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "PrepareWarmTransferIntro",
+      requestType = com.ondewo.nlu.PrepareWarmTransferIntroRequest.class,
+      responseType = com.ondewo.nlu.PrepareWarmTransferIntroResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.PrepareWarmTransferIntroRequest,
+      com.ondewo.nlu.PrepareWarmTransferIntroResponse> getPrepareWarmTransferIntroMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.PrepareWarmTransferIntroRequest, com.ondewo.nlu.PrepareWarmTransferIntroResponse> getPrepareWarmTransferIntroMethod;
+    if ((getPrepareWarmTransferIntroMethod = SessionsGrpc.getPrepareWarmTransferIntroMethod) == null) {
+      synchronized (SessionsGrpc.class) {
+        if ((getPrepareWarmTransferIntroMethod = SessionsGrpc.getPrepareWarmTransferIntroMethod) == null) {
+          SessionsGrpc.getPrepareWarmTransferIntroMethod = getPrepareWarmTransferIntroMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.PrepareWarmTransferIntroRequest, com.ondewo.nlu.PrepareWarmTransferIntroResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "PrepareWarmTransferIntro"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.PrepareWarmTransferIntroRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.PrepareWarmTransferIntroResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new SessionsMethodDescriptorSupplier("PrepareWarmTransferIntro"))
+              .build();
+        }
+      }
+    }
+    return getPrepareWarmTransferIntroMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest,
+      com.ondewo.nlu.WarmTransferIntroOutcome> getGetWarmTransferIntroOutcomeMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "GetWarmTransferIntroOutcome",
+      requestType = com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest.class,
+      responseType = com.ondewo.nlu.WarmTransferIntroOutcome.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest,
+      com.ondewo.nlu.WarmTransferIntroOutcome> getGetWarmTransferIntroOutcomeMethod() {
+    io.grpc.MethodDescriptor<com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest, com.ondewo.nlu.WarmTransferIntroOutcome> getGetWarmTransferIntroOutcomeMethod;
+    if ((getGetWarmTransferIntroOutcomeMethod = SessionsGrpc.getGetWarmTransferIntroOutcomeMethod) == null) {
+      synchronized (SessionsGrpc.class) {
+        if ((getGetWarmTransferIntroOutcomeMethod = SessionsGrpc.getGetWarmTransferIntroOutcomeMethod) == null) {
+          SessionsGrpc.getGetWarmTransferIntroOutcomeMethod = getGetWarmTransferIntroOutcomeMethod =
+              io.grpc.MethodDescriptor.<com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest, com.ondewo.nlu.WarmTransferIntroOutcome>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "GetWarmTransferIntroOutcome"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.ondewo.nlu.WarmTransferIntroOutcome.getDefaultInstance()))
+              .setSchemaDescriptor(new SessionsMethodDescriptorSupplier("GetWarmTransferIntroOutcome"))
+              .build();
+        }
+      }
+    }
+    return getGetWarmTransferIntroOutcomeMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<com.ondewo.nlu.ListSessionsRequest,
       com.ondewo.nlu.ListSessionsResponse> getListSessionsMethod;
 
@@ -1658,6 +1751,51 @@ public final class SessionsGrpc {
 
     /**
      * <pre>
+     * Interrupts a turn of the session outside a &lt;code&gt;StreamingDetectIntent&lt;/code&gt; stream: cancels it, reports what
+     * the user actually heard of its answer, or discards the session step of a preemptive draft. Meant for clients
+     * without a call-length stream (e.g. a stop button) and for a heard report that arrives after the stream closed.
+     * A voice client with an open stream sends the same &lt;code&gt;TurnControl&lt;/code&gt; on that stream instead
+     * (&lt;code&gt;StreamingDetectIntentRequest.turn_control&lt;/code&gt;). Requires the permission to interrupt a turn of the
+     * session's project.
+     * </pre>
+     */
+    default void interruptTurn(com.ondewo.nlu.InterruptTurnRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.InterruptTurnResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getInterruptTurnMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Prepares the intro session of a warm transfer: reads the history, the contexts and the slots of the source
+     * (caller) session, renders the intro text (with an LLM within a time budget, or from the TEMPLATE when the LLM
+     * fails or is not configured), strips every &lt;code&gt;&amp;lt;SIP:…&amp;gt;&lt;/code&gt; markup from it, and stores the text, the
+     * configuration and the stage in the intro session, which must not exist yet. Writes no step into the source
+     * session. Idempotent per (&lt;code&gt;intro_session&lt;/code&gt;, &lt;code&gt;transfer_request_id&lt;/code&gt;): a repeated request
+     * answers the response of the first one. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer
+     * feature is switched off, and &lt;code&gt;FAILED_PRECONDITION&lt;/code&gt; with &lt;code&gt;reason=warm-intro-disabled-for-agent&lt;/code&gt;
+     * when &lt;code&gt;Agent.warm_transfer_settings.enabled&lt;/code&gt; is false. Requires the permission to run a warm transfer
+     * intro of the session's project. See &lt;code&gt;docs/warm_transfer.md&lt;/code&gt;.
+     * </pre>
+     */
+    default void prepareWarmTransferIntro(com.ondewo.nlu.PrepareWarmTransferIntroRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.PrepareWarmTransferIntroResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getPrepareWarmTransferIntroMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Returns the decision the target gave in the intro session of a warm transfer. Never returns the reason text
+     * or the intro text. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer feature is switched off.
+     * Requires the permission to run a warm transfer intro of the session's project.
+     * </pre>
+     */
+    default void getWarmTransferIntroOutcome(com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.WarmTransferIntroOutcome> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetWarmTransferIntroOutcomeMethod(), responseObserver);
+    }
+
+    /**
+     * <pre>
      * ListSessions: returns list of sessions from ondewo-kb; by default returns only session IDs
      * </pre>
      */
@@ -2214,6 +2352,54 @@ public final class SessionsGrpc {
         io.grpc.stub.StreamObserver<com.ondewo.nlu.StreamingDetectIntentResponse> responseObserver) {
       return io.grpc.stub.ClientCalls.asyncBidiStreamingCall(
           getChannel().newCall(getStreamingDetectIntentMethod(), getCallOptions()), responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Interrupts a turn of the session outside a &lt;code&gt;StreamingDetectIntent&lt;/code&gt; stream: cancels it, reports what
+     * the user actually heard of its answer, or discards the session step of a preemptive draft. Meant for clients
+     * without a call-length stream (e.g. a stop button) and for a heard report that arrives after the stream closed.
+     * A voice client with an open stream sends the same &lt;code&gt;TurnControl&lt;/code&gt; on that stream instead
+     * (&lt;code&gt;StreamingDetectIntentRequest.turn_control&lt;/code&gt;). Requires the permission to interrupt a turn of the
+     * session's project.
+     * </pre>
+     */
+    public void interruptTurn(com.ondewo.nlu.InterruptTurnRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.InterruptTurnResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getInterruptTurnMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Prepares the intro session of a warm transfer: reads the history, the contexts and the slots of the source
+     * (caller) session, renders the intro text (with an LLM within a time budget, or from the TEMPLATE when the LLM
+     * fails or is not configured), strips every &lt;code&gt;&amp;lt;SIP:…&amp;gt;&lt;/code&gt; markup from it, and stores the text, the
+     * configuration and the stage in the intro session, which must not exist yet. Writes no step into the source
+     * session. Idempotent per (&lt;code&gt;intro_session&lt;/code&gt;, &lt;code&gt;transfer_request_id&lt;/code&gt;): a repeated request
+     * answers the response of the first one. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer
+     * feature is switched off, and &lt;code&gt;FAILED_PRECONDITION&lt;/code&gt; with &lt;code&gt;reason=warm-intro-disabled-for-agent&lt;/code&gt;
+     * when &lt;code&gt;Agent.warm_transfer_settings.enabled&lt;/code&gt; is false. Requires the permission to run a warm transfer
+     * intro of the session's project. See &lt;code&gt;docs/warm_transfer.md&lt;/code&gt;.
+     * </pre>
+     */
+    public void prepareWarmTransferIntro(com.ondewo.nlu.PrepareWarmTransferIntroRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.PrepareWarmTransferIntroResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getPrepareWarmTransferIntroMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     * <pre>
+     * Returns the decision the target gave in the intro session of a warm transfer. Never returns the reason text
+     * or the intro text. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer feature is switched off.
+     * Requires the permission to run a warm transfer intro of the session's project.
+     * </pre>
+     */
+    public void getWarmTransferIntroOutcome(com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest request,
+        io.grpc.stub.StreamObserver<com.ondewo.nlu.WarmTransferIntroOutcome> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getGetWarmTransferIntroOutcomeMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -2812,6 +2998,51 @@ public final class SessionsGrpc {
 
     /**
      * <pre>
+     * Interrupts a turn of the session outside a &lt;code&gt;StreamingDetectIntent&lt;/code&gt; stream: cancels it, reports what
+     * the user actually heard of its answer, or discards the session step of a preemptive draft. Meant for clients
+     * without a call-length stream (e.g. a stop button) and for a heard report that arrives after the stream closed.
+     * A voice client with an open stream sends the same &lt;code&gt;TurnControl&lt;/code&gt; on that stream instead
+     * (&lt;code&gt;StreamingDetectIntentRequest.turn_control&lt;/code&gt;). Requires the permission to interrupt a turn of the
+     * session's project.
+     * </pre>
+     */
+    public com.ondewo.nlu.InterruptTurnResponse interruptTurn(com.ondewo.nlu.InterruptTurnRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getInterruptTurnMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Prepares the intro session of a warm transfer: reads the history, the contexts and the slots of the source
+     * (caller) session, renders the intro text (with an LLM within a time budget, or from the TEMPLATE when the LLM
+     * fails or is not configured), strips every &lt;code&gt;&amp;lt;SIP:…&amp;gt;&lt;/code&gt; markup from it, and stores the text, the
+     * configuration and the stage in the intro session, which must not exist yet. Writes no step into the source
+     * session. Idempotent per (&lt;code&gt;intro_session&lt;/code&gt;, &lt;code&gt;transfer_request_id&lt;/code&gt;): a repeated request
+     * answers the response of the first one. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer
+     * feature is switched off, and &lt;code&gt;FAILED_PRECONDITION&lt;/code&gt; with &lt;code&gt;reason=warm-intro-disabled-for-agent&lt;/code&gt;
+     * when &lt;code&gt;Agent.warm_transfer_settings.enabled&lt;/code&gt; is false. Requires the permission to run a warm transfer
+     * intro of the session's project. See &lt;code&gt;docs/warm_transfer.md&lt;/code&gt;.
+     * </pre>
+     */
+    public com.ondewo.nlu.PrepareWarmTransferIntroResponse prepareWarmTransferIntro(com.ondewo.nlu.PrepareWarmTransferIntroRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getPrepareWarmTransferIntroMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Returns the decision the target gave in the intro session of a warm transfer. Never returns the reason text
+     * or the intro text. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer feature is switched off.
+     * Requires the permission to run a warm transfer intro of the session's project.
+     * </pre>
+     */
+    public com.ondewo.nlu.WarmTransferIntroOutcome getWarmTransferIntroOutcome(com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest request) throws io.grpc.StatusException {
+      return io.grpc.stub.ClientCalls.blockingV2UnaryCall(
+          getChannel(), getGetWarmTransferIntroOutcomeMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
      * ListSessions: returns list of sessions from ondewo-kb; by default returns only session IDs
      * </pre>
      */
@@ -3340,6 +3571,51 @@ public final class SessionsGrpc {
     public com.ondewo.nlu.DetectIntentResponse detectIntent(com.ondewo.nlu.DetectIntentRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getDetectIntentMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Interrupts a turn of the session outside a &lt;code&gt;StreamingDetectIntent&lt;/code&gt; stream: cancels it, reports what
+     * the user actually heard of its answer, or discards the session step of a preemptive draft. Meant for clients
+     * without a call-length stream (e.g. a stop button) and for a heard report that arrives after the stream closed.
+     * A voice client with an open stream sends the same &lt;code&gt;TurnControl&lt;/code&gt; on that stream instead
+     * (&lt;code&gt;StreamingDetectIntentRequest.turn_control&lt;/code&gt;). Requires the permission to interrupt a turn of the
+     * session's project.
+     * </pre>
+     */
+    public com.ondewo.nlu.InterruptTurnResponse interruptTurn(com.ondewo.nlu.InterruptTurnRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getInterruptTurnMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Prepares the intro session of a warm transfer: reads the history, the contexts and the slots of the source
+     * (caller) session, renders the intro text (with an LLM within a time budget, or from the TEMPLATE when the LLM
+     * fails or is not configured), strips every &lt;code&gt;&amp;lt;SIP:…&amp;gt;&lt;/code&gt; markup from it, and stores the text, the
+     * configuration and the stage in the intro session, which must not exist yet. Writes no step into the source
+     * session. Idempotent per (&lt;code&gt;intro_session&lt;/code&gt;, &lt;code&gt;transfer_request_id&lt;/code&gt;): a repeated request
+     * answers the response of the first one. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer
+     * feature is switched off, and &lt;code&gt;FAILED_PRECONDITION&lt;/code&gt; with &lt;code&gt;reason=warm-intro-disabled-for-agent&lt;/code&gt;
+     * when &lt;code&gt;Agent.warm_transfer_settings.enabled&lt;/code&gt; is false. Requires the permission to run a warm transfer
+     * intro of the session's project. See &lt;code&gt;docs/warm_transfer.md&lt;/code&gt;.
+     * </pre>
+     */
+    public com.ondewo.nlu.PrepareWarmTransferIntroResponse prepareWarmTransferIntro(com.ondewo.nlu.PrepareWarmTransferIntroRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getPrepareWarmTransferIntroMethod(), getCallOptions(), request);
+    }
+
+    /**
+     * <pre>
+     * Returns the decision the target gave in the intro session of a warm transfer. Never returns the reason text
+     * or the intro text. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer feature is switched off.
+     * Requires the permission to run a warm transfer intro of the session's project.
+     * </pre>
+     */
+    public com.ondewo.nlu.WarmTransferIntroOutcome getWarmTransferIntroOutcome(com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getGetWarmTransferIntroOutcomeMethod(), getCallOptions(), request);
     }
 
     /**
@@ -3873,6 +4149,54 @@ public final class SessionsGrpc {
         com.ondewo.nlu.DetectIntentRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getDetectIntentMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Interrupts a turn of the session outside a &lt;code&gt;StreamingDetectIntent&lt;/code&gt; stream: cancels it, reports what
+     * the user actually heard of its answer, or discards the session step of a preemptive draft. Meant for clients
+     * without a call-length stream (e.g. a stop button) and for a heard report that arrives after the stream closed.
+     * A voice client with an open stream sends the same &lt;code&gt;TurnControl&lt;/code&gt; on that stream instead
+     * (&lt;code&gt;StreamingDetectIntentRequest.turn_control&lt;/code&gt;). Requires the permission to interrupt a turn of the
+     * session's project.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.InterruptTurnResponse> interruptTurn(
+        com.ondewo.nlu.InterruptTurnRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getInterruptTurnMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Prepares the intro session of a warm transfer: reads the history, the contexts and the slots of the source
+     * (caller) session, renders the intro text (with an LLM within a time budget, or from the TEMPLATE when the LLM
+     * fails or is not configured), strips every &lt;code&gt;&amp;lt;SIP:…&amp;gt;&lt;/code&gt; markup from it, and stores the text, the
+     * configuration and the stage in the intro session, which must not exist yet. Writes no step into the source
+     * session. Idempotent per (&lt;code&gt;intro_session&lt;/code&gt;, &lt;code&gt;transfer_request_id&lt;/code&gt;): a repeated request
+     * answers the response of the first one. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer
+     * feature is switched off, and &lt;code&gt;FAILED_PRECONDITION&lt;/code&gt; with &lt;code&gt;reason=warm-intro-disabled-for-agent&lt;/code&gt;
+     * when &lt;code&gt;Agent.warm_transfer_settings.enabled&lt;/code&gt; is false. Requires the permission to run a warm transfer
+     * intro of the session's project. See &lt;code&gt;docs/warm_transfer.md&lt;/code&gt;.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.PrepareWarmTransferIntroResponse> prepareWarmTransferIntro(
+        com.ondewo.nlu.PrepareWarmTransferIntroRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getPrepareWarmTransferIntroMethod(), getCallOptions()), request);
+    }
+
+    /**
+     * <pre>
+     * Returns the decision the target gave in the intro session of a warm transfer. Never returns the reason text
+     * or the intro text. Answers &lt;code&gt;UNIMPLEMENTED&lt;/code&gt; when the server's warm transfer feature is switched off.
+     * Requires the permission to run a warm transfer intro of the session's project.
+     * </pre>
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.ondewo.nlu.WarmTransferIntroOutcome> getWarmTransferIntroOutcome(
+        com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getGetWarmTransferIntroOutcomeMethod(), getCallOptions()), request);
     }
 
     /**
@@ -4424,55 +4748,58 @@ public final class SessionsGrpc {
   }
 
   private static final int METHODID_DETECT_INTENT = 0;
-  private static final int METHODID_LIST_SESSIONS = 1;
-  private static final int METHODID_GET_SESSION = 2;
-  private static final int METHODID_CREATE_SESSION = 3;
-  private static final int METHODID_CREATE_SESSION_STEP = 4;
-  private static final int METHODID_GET_SESSION_STEP = 5;
-  private static final int METHODID_UPDATE_SESSION_STEP = 6;
-  private static final int METHODID_DELETE_SESSION_STEP = 7;
-  private static final int METHODID_DELETE_SESSION = 8;
-  private static final int METHODID_LIST_SESSION_LABELS = 9;
-  private static final int METHODID_LIST_SESSION_LABELS_OF_ALL_SESSIONS = 10;
-  private static final int METHODID_LIST_LANGUAGE_CODES_OF_ALL_SESSIONS = 11;
-  private static final int METHODID_LIST_MATCHED_INTENTS_OF_ALL_SESSIONS = 12;
-  private static final int METHODID_LIST_MATCHED_ENTITY_TYPES_OF_ALL_SESSIONS = 13;
-  private static final int METHODID_LIST_USER_IDS_OF_ALL_SESSIONS = 14;
-  private static final int METHODID_LIST_IDENTIFIED_USER_IDS_OF_ALL_SESSIONS = 15;
-  private static final int METHODID_LIST_TAGS_OF_ALL_SESSIONS = 16;
-  private static final int METHODID_LIST_INPUT_CONTEXTS_OF_ALL_SESSIONS = 17;
-  private static final int METHODID_LIST_OUTPUT_CONTEXTS_OF_ALL_SESSIONS = 18;
-  private static final int METHODID_LIST_PLATFORMS_OF_ALL_SESSIONS = 19;
-  private static final int METHODID_LIST_ACCOUNT_IDS_OF_ALL_SESSIONS = 20;
-  private static final int METHODID_LIST_PROPERTY_IDS_OF_ALL_SESSIONS = 21;
-  private static final int METHODID_LIST_DATASTREAM_IDS_OF_ALL_SESSIONS = 22;
-  private static final int METHODID_LIST_ORIGIN_IDS_OF_ALL_SESSIONS = 23;
-  private static final int METHODID_ADD_SESSION_LABELS = 24;
-  private static final int METHODID_DELETE_SESSION_LABELS = 25;
-  private static final int METHODID_ADD_SESSION_COMMENT = 26;
-  private static final int METHODID_DELETE_SESSION_COMMENTS = 27;
-  private static final int METHODID_UPDATE_SESSION_COMMENTS = 28;
-  private static final int METHODID_LIST_SESSION_COMMENTS = 29;
-  private static final int METHODID_LIST_SESSION_COMMENTS_OF_ALL_SESSIONS = 30;
-  private static final int METHODID_ADD_SESSION_FEEDBACK = 31;
-  private static final int METHODID_ADD_SESSION_STEP_FEEDBACK = 32;
-  private static final int METHODID_GET_SESSION_FEEDBACK = 33;
-  private static final int METHODID_UPDATE_SESSION_FEEDBACK = 34;
-  private static final int METHODID_DELETE_SESSION_FEEDBACK = 35;
-  private static final int METHODID_LIST_SESSION_FEEDBACK = 36;
-  private static final int METHODID_LIST_SESSION_FEEDBACK_OF_ALL_SESSIONS = 37;
-  private static final int METHODID_GET_FEEDBACK_STATISTICS = 38;
-  private static final int METHODID_GET_FEEDBACK_STATISTICS_TIME_SERIES = 39;
-  private static final int METHODID_LIST_SESSION_REVIEWS = 40;
-  private static final int METHODID_GET_SESSION_REVIEW = 41;
-  private static final int METHODID_GET_LATEST_SESSION_REVIEW = 42;
-  private static final int METHODID_CREATE_SESSION_REVIEW = 43;
-  private static final int METHODID_GET_AUDIO_FILES = 44;
-  private static final int METHODID_ADD_AUDIO_FILES = 45;
-  private static final int METHODID_DELETE_AUDIO_FILES = 46;
-  private static final int METHODID_GET_AUDIO_FILE_OF_SESSION = 47;
-  private static final int METHODID_LIST_AUDIO_FILES = 48;
-  private static final int METHODID_STREAMING_DETECT_INTENT = 49;
+  private static final int METHODID_INTERRUPT_TURN = 1;
+  private static final int METHODID_PREPARE_WARM_TRANSFER_INTRO = 2;
+  private static final int METHODID_GET_WARM_TRANSFER_INTRO_OUTCOME = 3;
+  private static final int METHODID_LIST_SESSIONS = 4;
+  private static final int METHODID_GET_SESSION = 5;
+  private static final int METHODID_CREATE_SESSION = 6;
+  private static final int METHODID_CREATE_SESSION_STEP = 7;
+  private static final int METHODID_GET_SESSION_STEP = 8;
+  private static final int METHODID_UPDATE_SESSION_STEP = 9;
+  private static final int METHODID_DELETE_SESSION_STEP = 10;
+  private static final int METHODID_DELETE_SESSION = 11;
+  private static final int METHODID_LIST_SESSION_LABELS = 12;
+  private static final int METHODID_LIST_SESSION_LABELS_OF_ALL_SESSIONS = 13;
+  private static final int METHODID_LIST_LANGUAGE_CODES_OF_ALL_SESSIONS = 14;
+  private static final int METHODID_LIST_MATCHED_INTENTS_OF_ALL_SESSIONS = 15;
+  private static final int METHODID_LIST_MATCHED_ENTITY_TYPES_OF_ALL_SESSIONS = 16;
+  private static final int METHODID_LIST_USER_IDS_OF_ALL_SESSIONS = 17;
+  private static final int METHODID_LIST_IDENTIFIED_USER_IDS_OF_ALL_SESSIONS = 18;
+  private static final int METHODID_LIST_TAGS_OF_ALL_SESSIONS = 19;
+  private static final int METHODID_LIST_INPUT_CONTEXTS_OF_ALL_SESSIONS = 20;
+  private static final int METHODID_LIST_OUTPUT_CONTEXTS_OF_ALL_SESSIONS = 21;
+  private static final int METHODID_LIST_PLATFORMS_OF_ALL_SESSIONS = 22;
+  private static final int METHODID_LIST_ACCOUNT_IDS_OF_ALL_SESSIONS = 23;
+  private static final int METHODID_LIST_PROPERTY_IDS_OF_ALL_SESSIONS = 24;
+  private static final int METHODID_LIST_DATASTREAM_IDS_OF_ALL_SESSIONS = 25;
+  private static final int METHODID_LIST_ORIGIN_IDS_OF_ALL_SESSIONS = 26;
+  private static final int METHODID_ADD_SESSION_LABELS = 27;
+  private static final int METHODID_DELETE_SESSION_LABELS = 28;
+  private static final int METHODID_ADD_SESSION_COMMENT = 29;
+  private static final int METHODID_DELETE_SESSION_COMMENTS = 30;
+  private static final int METHODID_UPDATE_SESSION_COMMENTS = 31;
+  private static final int METHODID_LIST_SESSION_COMMENTS = 32;
+  private static final int METHODID_LIST_SESSION_COMMENTS_OF_ALL_SESSIONS = 33;
+  private static final int METHODID_ADD_SESSION_FEEDBACK = 34;
+  private static final int METHODID_ADD_SESSION_STEP_FEEDBACK = 35;
+  private static final int METHODID_GET_SESSION_FEEDBACK = 36;
+  private static final int METHODID_UPDATE_SESSION_FEEDBACK = 37;
+  private static final int METHODID_DELETE_SESSION_FEEDBACK = 38;
+  private static final int METHODID_LIST_SESSION_FEEDBACK = 39;
+  private static final int METHODID_LIST_SESSION_FEEDBACK_OF_ALL_SESSIONS = 40;
+  private static final int METHODID_GET_FEEDBACK_STATISTICS = 41;
+  private static final int METHODID_GET_FEEDBACK_STATISTICS_TIME_SERIES = 42;
+  private static final int METHODID_LIST_SESSION_REVIEWS = 43;
+  private static final int METHODID_GET_SESSION_REVIEW = 44;
+  private static final int METHODID_GET_LATEST_SESSION_REVIEW = 45;
+  private static final int METHODID_CREATE_SESSION_REVIEW = 46;
+  private static final int METHODID_GET_AUDIO_FILES = 47;
+  private static final int METHODID_ADD_AUDIO_FILES = 48;
+  private static final int METHODID_DELETE_AUDIO_FILES = 49;
+  private static final int METHODID_GET_AUDIO_FILE_OF_SESSION = 50;
+  private static final int METHODID_LIST_AUDIO_FILES = 51;
+  private static final int METHODID_STREAMING_DETECT_INTENT = 52;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -4494,6 +4821,18 @@ public final class SessionsGrpc {
         case METHODID_DETECT_INTENT:
           serviceImpl.detectIntent((com.ondewo.nlu.DetectIntentRequest) request,
               (io.grpc.stub.StreamObserver<com.ondewo.nlu.DetectIntentResponse>) responseObserver);
+          break;
+        case METHODID_INTERRUPT_TURN:
+          serviceImpl.interruptTurn((com.ondewo.nlu.InterruptTurnRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.InterruptTurnResponse>) responseObserver);
+          break;
+        case METHODID_PREPARE_WARM_TRANSFER_INTRO:
+          serviceImpl.prepareWarmTransferIntro((com.ondewo.nlu.PrepareWarmTransferIntroRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.PrepareWarmTransferIntroResponse>) responseObserver);
+          break;
+        case METHODID_GET_WARM_TRANSFER_INTRO_OUTCOME:
+          serviceImpl.getWarmTransferIntroOutcome((com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest) request,
+              (io.grpc.stub.StreamObserver<com.ondewo.nlu.WarmTransferIntroOutcome>) responseObserver);
           break;
         case METHODID_LIST_SESSIONS:
           serviceImpl.listSessions((com.ondewo.nlu.ListSessionsRequest) request,
@@ -4722,6 +5061,27 @@ public final class SessionsGrpc {
               com.ondewo.nlu.StreamingDetectIntentRequest,
               com.ondewo.nlu.StreamingDetectIntentResponse>(
                 service, METHODID_STREAMING_DETECT_INTENT)))
+        .addMethod(
+          getInterruptTurnMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.InterruptTurnRequest,
+              com.ondewo.nlu.InterruptTurnResponse>(
+                service, METHODID_INTERRUPT_TURN)))
+        .addMethod(
+          getPrepareWarmTransferIntroMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.PrepareWarmTransferIntroRequest,
+              com.ondewo.nlu.PrepareWarmTransferIntroResponse>(
+                service, METHODID_PREPARE_WARM_TRANSFER_INTRO)))
+        .addMethod(
+          getGetWarmTransferIntroOutcomeMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.ondewo.nlu.GetWarmTransferIntroOutcomeRequest,
+              com.ondewo.nlu.WarmTransferIntroOutcome>(
+                service, METHODID_GET_WARM_TRANSFER_INTRO_OUTCOME)))
         .addMethod(
           getListSessionsMethod(),
           io.grpc.stub.ServerCalls.asyncUnaryCall(
@@ -5108,6 +5468,9 @@ public final class SessionsGrpc {
               .setSchemaDescriptor(new SessionsFileDescriptorSupplier())
               .addMethod(getDetectIntentMethod())
               .addMethod(getStreamingDetectIntentMethod())
+              .addMethod(getInterruptTurnMethod())
+              .addMethod(getPrepareWarmTransferIntroMethod())
+              .addMethod(getGetWarmTransferIntroOutcomeMethod())
               .addMethod(getListSessionsMethod())
               .addMethod(getGetSessionMethod())
               .addMethod(getCreateSessionMethod())

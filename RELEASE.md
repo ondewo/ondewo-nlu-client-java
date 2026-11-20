@@ -2,6 +2,15 @@
 
 *****************
 
+## Release ONDEWO NLU Java Client 7.6.0
+
+### Improvements
+
+* Tracking API Version [7.6.0](https://github.com/ondewo/ondewo-nlu-api/releases/tag/7.6.0) ( [Documentation](https://ondewo.github.io/ondewo-nlu-api/) )
+* Generated with ondewo-proto-compiler 5.17.0 (protoc 35.1). New runtime floors: protobuf-java 4.35.1, grpc-java 1.85.1 and proto-google-common-protos 2.82.0.
+
+*****************
+
 ## Release ONDEWO NLU Java Client 7.4.0
 
 ### Improvements

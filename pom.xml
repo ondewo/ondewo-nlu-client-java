@@ -31,7 +31,7 @@
 
   <groupId>com.ondewo</groupId>
   <artifactId>ondewo-nlu-client-java</artifactId>
-  <version>7.4.0</version>
+  <version>7.6.0</version>
   <packaging>jar</packaging>
 
   <name>ondewo-nlu-client-java</name>
@@ -78,9 +78,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>11</maven.compiler.release>
-    <grpc.version>1.84.0</grpc.version>
-    <protobuf.version>4.33.6</protobuf.version>
-    <google.common.protos.version>2.76.0</google.common.protos.version>
+    <grpc.version>1.85.1</grpc.version>
+    <protobuf.version>4.35.1</protobuf.version>
+    <google.common.protos.version>2.82.0</google.common.protos.version>
     <!-- HAND-WRITTEN. 5.11.x is the last JUnit line that still runs on java 8/11; 5.13+ and
          JUnit 6 require java 17 and would break the JDK 11 half of the CI matrix. -->
     <junit.version>5.11.4</junit.version>
