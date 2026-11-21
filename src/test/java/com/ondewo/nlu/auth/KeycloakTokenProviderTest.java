@@ -102,6 +102,20 @@ class KeycloakTokenProviderTest {
         }
 
         @Test
+        void theExponentCapComesFromTheTimingsNotTheConstant() {
+            final KeycloakTimings capped = new KeycloakTimings(30, 1, 5, 1e9, 10, 5, 2);
+            assertEquals(20.0, KeycloakTokenProvider.backoffDelaySeconds(3, () -> 1.0, capped));
+            assertEquals(20.0, KeycloakTokenProvider.backoffDelaySeconds(50, () -> 1.0, capped));
+            final KeycloakTimings uncapped = new KeycloakTimings(30, 1, 5, 1e9, 10, 5, 0);
+            assertEquals(5.0, KeycloakTokenProvider.backoffDelaySeconds(9, () -> 1.0, uncapped));
+            final KeycloakTimings negative = new KeycloakTimings(30, 1, 5, 1e9, 10, 5, -4);
+            assertEquals(5.0, KeycloakTokenProvider.backoffDelaySeconds(9, () -> 1.0, negative));
+            assertEquals(KeycloakTokenProvider.MAX_RETRY_EXPONENT, T.maxRetryExponent);
+            assertEquals(
+                    KeycloakTokenProvider.MAX_RETRY_EXPONENT, new KeycloakTimings(30, 1, 5, 300, 10, 5).maxRetryExponent);
+        }
+
+        @Test
         void t06AHugeFailureCountNeitherOverflowsNorExceedsTheCeiling() {
             assertEquals(300.0, backoff(1_000_000_000, 1.0));
             assertEquals(300.0, backoff(Integer.MAX_VALUE, 1.0));
@@ -663,7 +677,19 @@ class KeycloakTokenProviderTest {
                     assertThrows(
                             KeycloakAuthenticationException.class,
                             () -> build(new FakeTransport(refused(200, "{\"z\":1,\"expires_in\":2,\"a\":3}")), new FakeClock(0)));
-            assertTrue(raised.getMessage().contains("[a, expires_in, z]"), raised.getMessage());
+            assertTrue(raised.getMessage().contains("['a', 'expires_in', 'z']"), raised.getMessage());
+        }
+
+        @Test
+        void s1FieldNamesAreQuotedAsPythonReprQuotesThem() {
+            assertEquals("[]", KeycloakTokenProvider.pythonListOfNames(Collections.emptyList()));
+            assertEquals("['a', 'b']", KeycloakTokenProvider.pythonListOfNames(Arrays.asList("b", "a")));
+            assertEquals("[\"it's\"]", KeycloakTokenProvider.pythonListOfNames(Collections.singletonList("it's")));
+            assertEquals("['a\\'\"b']", KeycloakTokenProvider.pythonListOfNames(Collections.singletonList("a'\"b")));
+            assertEquals(
+                    "['c\\x01', 'd\\x7f', 'n\\n', 'r\\r', 't\\t', 'x\\\\y']",
+                    KeycloakTokenProvider.pythonListOfNames(
+                            Arrays.asList("x\\y", "n\n", "t\t", "c\u0001", "r\r", "d\u007f")));
         }
 
         @Test

@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.lang.ref.Cleaner;
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -435,7 +436,7 @@ public final class KeycloakTokenProvider implements AutoCloseable {
      */
     static double backoffDelaySeconds(
             final int failures, final DoubleSupplier random, final KeycloakTimings timings) {
-        final int exponent = Math.min(Math.max(failures, 1) - 1, MAX_RETRY_EXPONENT);
+        final int exponent = Math.min(Math.max(failures, 1) - 1, timings.maxRetryExponent);
         final double ceiling =
                 Math.min(timings.retryBaseDelayS * Math.pow(2, exponent), timings.retryMaxDelayS);
         final double drawn = random.getAsDouble();
@@ -541,6 +542,46 @@ public final class KeycloakTokenProvider implements AutoCloseable {
         return primitive.isNumber() ? "number" : "boolean";
     }
 
+    /**
+     * Renders field names as the Python SDK does ({@code str(sorted(names))}): sorted, each one
+     * quoted as Python's {@code repr} quotes a string, e.g. {@code ['a', 'expires_in']}.
+     *
+     * @param names the field names; never values
+     * @return the rendered list
+     */
+    static String pythonListOfNames(final Collection<String> names) {
+        final StringBuilder rendered = new StringBuilder("[");
+        for (final String name : new TreeSet<>(names)) {
+            if (rendered.length() > 1) {
+                rendered.append(", ");
+            }
+            rendered.append(pythonRepr(name));
+        }
+        return rendered.append(']').toString();
+    }
+
+    private static String pythonRepr(final String value) {
+        final char quote = value.indexOf('\'') >= 0 && value.indexOf('"') < 0 ? '"' : '\'';
+        final StringBuilder out = new StringBuilder().append(quote);
+        for (int i = 0; i < value.length(); i++) {
+            final char c = value.charAt(i);
+            if (c == quote || c == '\\') {
+                out.append('\\').append(c);
+            } else if (c == '\n') {
+                out.append("\\n");
+            } else if (c == '\r') {
+                out.append("\\r");
+            } else if (c == '\t') {
+                out.append("\\t");
+            } else if (c < 0x20 || c == 0x7f) {
+                out.append(String.format("\\x%02x", (int) c));
+            } else {
+                out.append(c);
+            }
+        }
+        return out.append(quote).toString();
+    }
+
     /** Validates EVERYTHING before assigning anything: a malformed response changes no state. */
     private void storeTokens(final JsonObject payload) {
         final String newAccessToken = nonEmptyString(payload.get("access_token"));
@@ -549,7 +590,7 @@ public final class KeycloakTokenProvider implements AutoCloseable {
             throw new KeycloakAuthenticationException(
                     "Keycloak token response did not contain an access_token; the response"
                             + " carried the fields "
-                            + new TreeSet<>(payload.keySet())
+                            + pythonListOfNames(payload.keySet())
                             + " (values withheld: a token response is credential material)");
         }
         final double expiresIn = expiresInSeconds(payload.get("expires_in"));
