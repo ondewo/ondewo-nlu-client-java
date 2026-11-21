@@ -1,5 +1,8 @@
 package com.ondewo.nlu.channel;
 
+import com.ondewo.nlu.auth.KeycloakCredentials;
+import com.ondewo.nlu.auth.KeycloakTokenProvider;
+
 import io.grpc.ChannelCredentials;
 import io.grpc.Grpc;
 import io.grpc.InsecureChannelCredentials;
@@ -12,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +33,11 @@ import java.util.logging.Logger;
  * ManagedChannel channel = GrpcChannels.newChannel(config);
  * }</pre>
  *
- * <p>One channel serves every stub of every service: build it once and share it.
+ * <p>One channel serves every stub of every service: build it once and share it. When the config
+ * configures Keycloak ({@link ClientConfig#isKeycloakConfigured()}), the channel authenticates
+ * every call with {@code authorization: Bearer <token>} from the shared {@link
+ * KeycloakTokenProvider} of those credentials; the first channel of a credential set performs the
+ * start-up token request, so opening it can throw {@code KeycloakAuthenticationException}.
  */
 public final class GrpcChannels {
 
@@ -48,6 +57,8 @@ public final class GrpcChannels {
     /**
      * @param config validated connection settings
      * @return a started channel; shut it down when done
+     * @throws com.ondewo.nlu.auth.KeycloakAuthenticationException if Keycloak is configured and
+     *     the start-up token request fails
      */
     public static ManagedChannel newChannel(final ClientConfig config) {
         return newChannelBuilder(config).build();
@@ -61,8 +72,19 @@ public final class GrpcChannels {
      * @param config validated connection settings
      * @return a channel builder for {@link ClientConfig#target()}
      * @throws IllegalArgumentException if the TLS material is not loadable PEM
+     * @throws com.ondewo.nlu.auth.KeycloakAuthenticationException if Keycloak is configured and
+     *     the start-up token request fails
      */
     public static ManagedChannelBuilder<?> newChannelBuilder(final ClientConfig config) {
+        return newChannelBuilder(config, KeycloakTokenProvider::shared);
+    }
+
+    /**
+     * @param providers looks up the token provider of the config's Keycloak credentials
+     */
+    static ManagedChannelBuilder<?> newChannelBuilder(
+            final ClientConfig config,
+            final Function<KeycloakCredentials, KeycloakTokenProvider> providers) {
         final ChannelCredentials credentials = credentials(config);
         final ManagedChannelBuilder<?> builder;
         try {
@@ -76,10 +98,15 @@ public final class GrpcChannels {
                             + " not file paths, and the key must be an unencrypted PKCS#8 PEM",
                     e);
         }
-        return builder.keepAliveTime(KEEPALIVE_TIME_MS, TimeUnit.MILLISECONDS)
+        builder.keepAliveTime(KEEPALIVE_TIME_MS, TimeUnit.MILLISECONDS)
                 .keepAliveTimeout(KEEPALIVE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
                 .keepAliveWithoutCalls(false)
                 .maxInboundMessageSize(MAX_MESSAGE_LENGTH);
+        final Optional<KeycloakCredentials> keycloak = config.keycloakCredentials();
+        if (keycloak.isPresent()) {
+            builder.intercept(providers.apply(keycloak.get()).toInterceptor());
+        }
+        return builder;
     }
 
     /**

@@ -1,5 +1,9 @@
 package com.ondewo.nlu.channel;
 
+import com.ondewo.nlu.auth.KeycloakCredentials;
+
+import java.util.Optional;
+
 /**
  * Where and how to connect to an ONDEWO server: host, port, and the TLS / mutual-TLS material.
  *
@@ -16,8 +20,16 @@ package com.ondewo.nlu.channel;
  *       client identity.
  * </ul>
  *
+ * <p>Keycloak (optional): {@code keycloakUrl}, {@code realm} and {@code clientId} are all set or
+ * all empty. When set, {@link GrpcChannels} authenticates every call with a token from the shared
+ * {@code com.ondewo.nlu.auth.KeycloakTokenProvider}, which needs EITHER {@code password} (a
+ * password grant with {@code username}) OR {@code refreshToken} (a handed-off offline token; the
+ * password is then never sent). When the three are empty no {@code authorization} header is
+ * attached.
+ *
  * <p>Every rule is checked by {@link Builder#build()}, so an invalid config never reaches gRPC.
- * No error message and no {@link #toString()} renders a PEM or the key.
+ * No error message and no {@link #toString()} renders a PEM, the key, the password or the
+ * refresh token.
  *
  * <p>This class lives in its own package on purpose: {@code make generate_ondewo_protos} deletes
  * only the {@code *.java} files of the leaf packages protoc regenerates, so a sibling package such
@@ -34,6 +46,15 @@ public final class ClientConfig {
     private final String grpcClientCert;
     private final String grpcClientKey;
     private final boolean useSecureChannel;
+    private final String keycloakUrl;
+    private final String realm;
+    private final String clientId;
+    private final String username;
+    private final String password;
+    private final Integer tokenExpirationInS;
+    private final boolean keycloakVerifySsl;
+    private final String refreshToken;
+    private final KeycloakCredentials keycloakCredentials;
 
     private ClientConfig(final Builder builder) {
         this.host = builder.host;
@@ -42,6 +63,26 @@ public final class ClientConfig {
         this.grpcClientCert = builder.grpcClientCert;
         this.grpcClientKey = builder.grpcClientKey;
         this.useSecureChannel = builder.useSecureChannel;
+        this.keycloakUrl = builder.keycloakUrl;
+        this.realm = builder.realm;
+        this.clientId = builder.clientId;
+        this.username = builder.username;
+        this.password = builder.password;
+        this.tokenExpirationInS = builder.tokenExpirationInS;
+        this.keycloakVerifySsl = builder.keycloakVerifySsl;
+        this.refreshToken = builder.refreshToken;
+        this.keycloakCredentials =
+                keycloakUrl.isEmpty()
+                        ? null
+                        : new KeycloakCredentials(
+                                keycloakUrl,
+                                realm,
+                                clientId,
+                                username,
+                                password,
+                                tokenExpirationInS,
+                                keycloakVerifySsl,
+                                refreshToken);
     }
 
     /** @return a builder with {@code useSecureChannel = true} and no certificate set */
@@ -79,6 +120,56 @@ public final class ClientConfig {
         return useSecureChannel;
     }
 
+    /** @return Keycloak base URL (before {@code /realms/<realm>}); empty without Keycloak */
+    public String getKeycloakUrl() {
+        return keycloakUrl;
+    }
+
+    /** @return the Keycloak realm; empty without Keycloak */
+    public String getRealm() {
+        return realm;
+    }
+
+    /** @return the public Keycloak SDK client id; empty without Keycloak */
+    public String getClientId() {
+        return clientId;
+    }
+
+    /** @return the technical user of the password grant */
+    public String getUsername() {
+        return username;
+    }
+
+    /** @return the technical user's password. Never log it. */
+    public String getPassword() {
+        return password;
+    }
+
+    /** @return how long the token auto-refresh runs in seconds, {@code null} for no bound */
+    public Integer getTokenExpirationInS() {
+        return tokenExpirationInS;
+    }
+
+    /** @return whether the token-endpoint call verifies Keycloak's TLS certificate */
+    public boolean isKeycloakVerifySsl() {
+        return keycloakVerifySsl;
+    }
+
+    /** @return the handed-off Keycloak offline refresh token. Never log it. */
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    /** @return {@code true} when {@code keycloakUrl}, {@code realm} and {@code clientId} are set */
+    public boolean isKeycloakConfigured() {
+        return keycloakCredentials != null;
+    }
+
+    /** @return the Keycloak identity of this config, empty when Keycloak is not configured */
+    public Optional<KeycloakCredentials> keycloakCredentials() {
+        return Optional.ofNullable(keycloakCredentials);
+    }
+
     /** @return {@code true} when a client certificate and key are set (mutual TLS) */
     public boolean hasClientIdentity() {
         return !grpcClientCert.isEmpty();
@@ -96,9 +187,9 @@ public final class ClientConfig {
     }
 
     /**
-     * Renders every field for logging. {@code grpcClientKey} shows as {@value #REDACTED} (empty
-     * when unset), and the certificates show only their length, so neither a key nor a PEM ever
-     * ends up in a log line.
+     * Renders every field for logging. {@code grpcClientKey}, {@code password} and {@code
+     * refreshToken} show as {@value #REDACTED} (empty when unset), and the certificates show only
+     * their length, so neither a secret nor a PEM ever ends up in a log line.
      */
     @Override
     public String toString() {
@@ -113,7 +204,23 @@ public final class ClientConfig {
                 + ", grpcClientCert="
                 + describePem(grpcClientCert)
                 + ", grpcClientKey="
-                + (grpcClientKey.isEmpty() ? "" : REDACTED)
+                + KeycloakCredentials.redact(grpcClientKey)
+                + ", keycloakUrl="
+                + keycloakUrl
+                + ", realm="
+                + realm
+                + ", clientId="
+                + clientId
+                + ", username="
+                + username
+                + ", password="
+                + KeycloakCredentials.redact(password)
+                + ", tokenExpirationInS="
+                + tokenExpirationInS
+                + ", keycloakVerifySsl="
+                + keycloakVerifySsl
+                + ", refreshToken="
+                + KeycloakCredentials.redact(refreshToken)
                 + "}";
     }
 
@@ -151,6 +258,14 @@ public final class ClientConfig {
         private String grpcClientCert = "";
         private String grpcClientKey = "";
         private boolean useSecureChannel = true;
+        private String keycloakUrl = "";
+        private String realm = "";
+        private String clientId = "";
+        private String username = "";
+        private String password = "";
+        private Integer tokenExpirationInS;
+        private boolean keycloakVerifySsl = true;
+        private String refreshToken = "";
 
         private Builder() {}
 
@@ -191,10 +306,73 @@ public final class ClientConfig {
         }
 
         /**
+         * @param keycloakUrl Keycloak base URL, the part before {@code /realms/<realm>}, e.g.
+         *     {@code https://host/auth}
+         */
+        public Builder keycloakUrl(final String keycloakUrl) {
+            this.keycloakUrl = orEmpty(keycloakUrl);
+            return this;
+        }
+
+        /** @param realm the Keycloak realm, e.g. {@code ondewo-ccai-platform} */
+        public Builder realm(final String realm) {
+            this.realm = orEmpty(realm);
+            return this;
+        }
+
+        /** @param clientId the PUBLIC SDK client id, e.g. {@code ondewo-nlu-cai-sdk-public} */
+        public Builder clientId(final String clientId) {
+            this.clientId = orEmpty(clientId);
+            return this;
+        }
+
+        /** @param username the technical user of the password grant */
+        public Builder username(final String username) {
+            this.username = orEmpty(username);
+            return this;
+        }
+
+        /** @param password the technical user's password; not needed with {@code refreshToken} */
+        public Builder password(final String password) {
+            this.password = orEmpty(password);
+            return this;
+        }
+
+        /**
+         * @param tokenExpirationInS how long the token auto-refresh runs, in seconds from the first
+         *     token; {@code null} (the default) refreshes until the offline session ends
+         */
+        public Builder tokenExpirationInS(final Integer tokenExpirationInS) {
+            this.tokenExpirationInS = tokenExpirationInS;
+            return this;
+        }
+
+        /**
+         * @param keycloakVerifySsl {@code false} skips the verification of Keycloak's TLS
+         *     certificate on the token-endpoint call only (a self-signed local ingress); default
+         *     {@code true}
+         */
+        public Builder keycloakVerifySsl(final boolean keycloakVerifySsl) {
+            this.keycloakVerifySsl = keycloakVerifySsl;
+            return this;
+        }
+
+        /**
+         * @param refreshToken a handed-off Keycloak OFFLINE refresh token: the provider starts with
+         *     a refresh grant and never sends a password, not even as a fallback
+         */
+        public Builder refreshToken(final String refreshToken) {
+            this.refreshToken = orEmpty(refreshToken);
+            return this;
+        }
+
+        /**
          * @return the validated, immutable config
          * @throws IllegalArgumentException if the host is blank, the port is out of range, only
          *     one of {@code grpcClientCert} / {@code grpcClientKey} is set, or a plaintext channel
-         *     is asked to carry a client identity. The message names fields, never their values.
+         *     is asked to carry a client identity, only some of {@code keycloakUrl} / {@code
+         *     realm} / {@code clientId} are set, or Keycloak is set without a {@code password} or
+         *     {@code refreshToken}. The message names fields, never their values.
          */
         public ClientConfig build() {
             if (host.trim().isEmpty()) {
@@ -220,6 +398,20 @@ public final class ClientConfig {
                                 + port
                                 + " - it would be silently dropped. Use a secure channel or"
                                 + " remove the identity.");
+            }
+            final int keycloakFields =
+                    (keycloakUrl.isEmpty() ? 0 : 1)
+                            + (realm.isEmpty() ? 0 : 1)
+                            + (clientId.isEmpty() ? 0 : 1);
+            if (keycloakFields != 0 && keycloakFields != 3) {
+                throw new IllegalArgumentException(
+                        "The Keycloak fields `keycloak_url`, `realm`, and `client_id` must be"
+                                + " provided together in ClientConfig.");
+            }
+            if (keycloakFields == 3 && password.isEmpty() && refreshToken.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Either the field `password` or the field `refresh_token` is mandatory in"
+                                + " ClientConfig.");
             }
             return new ClientConfig(this);
         }

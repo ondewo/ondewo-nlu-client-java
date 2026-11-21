@@ -83,6 +83,8 @@
     <google.common.protos.version>2.82.0</google.common.protos.version>
     <!-- HAND-WRITTEN. 5.11.x is the last JUnit line that still runs on java 8/11; 5.13+ and
          JUnit 6 require java 17 and would break the JDK 11 half of the CI matrix. -->
+    <!-- HAND-WRITTEN. The gson of grpc-core ${grpc.version}; see the dependency below. -->
+    <gson.version>2.14.0</gson.version>
     <junit.version>5.11.4</junit.version>
     <surefire.version>3.5.4</surefire.version>
     <jacoco.version>0.8.13</jacoco.version>
@@ -139,6 +141,15 @@
       <artifactId>grpc-netty-shaded</artifactId>
       <version>${grpc.version}</version>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- HAND-WRITTEN. JSON of the Keycloak token endpoint (com.ondewo.nlu.auth). Already on every
+         consumer's runtime classpath through grpc-core; declared at compile scope so the auth
+         code does not depend on a transitive. Keep it equal to the gson grpc-core declares. -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson.version}</version>
     </dependency>
 
     <!-- ============ HAND-WRITTEN block 2: test dependencies ============ -->

@@ -188,7 +188,108 @@ class ClientConfigTest {
     void toStringRendersAnUnsetSecretEmpty() {
         assertEquals(
                 "ClientConfig{host=localhost, port=50051, useSecureChannel=true, grpcCert=,"
-                        + " grpcClientCert=, grpcClientKey=}",
+                        + " grpcClientCert=, grpcClientKey=, keycloakUrl=, realm=, clientId=,"
+                        + " username=, password=, tokenExpirationInS=null, keycloakVerifySsl=true,"
+                        + " refreshToken=}",
                 base().build().toString());
     }
+
+    // region Keycloak (catalogue T55-T62)
+
+    private static ClientConfig.Builder keycloak() {
+        return base().keycloakUrl("https://keycloak.example/auth")
+                .realm("ondewo-test-realm")
+                .clientId("ondewo-nlu-cai-sdk-public")
+                .username("technical-user@example.com");
+    }
+
+    @Test
+    void t62WithoutTheTripleKeycloakIsNotConfigured() {
+        final ClientConfig config = base().username("u").password("p").refreshToken("t").build();
+        assertFalse(config.isKeycloakConfigured());
+        assertFalse(config.keycloakCredentials().isPresent());
+        assertEquals("", config.getKeycloakUrl());
+        assertEquals("", config.getRealm());
+        assertEquals("", config.getClientId());
+    }
+
+    @Test
+    void t58APasswordConfigIsKeycloakConfiguredAndKeepsEveryValue() {
+        final ClientConfig config =
+                keycloak().password("pw-1").tokenExpirationInS(600).keycloakVerifySsl(false).build();
+        assertTrue(config.isKeycloakConfigured());
+        assertEquals("https://keycloak.example/auth", config.getKeycloakUrl());
+        assertEquals("ondewo-test-realm", config.getRealm());
+        assertEquals("ondewo-nlu-cai-sdk-public", config.getClientId());
+        assertEquals("technical-user@example.com", config.getUsername());
+        assertEquals("pw-1", config.getPassword());
+        assertEquals(600, config.getTokenExpirationInS());
+        assertFalse(config.isKeycloakVerifySsl());
+        assertEquals("", config.getRefreshToken());
+        final com.ondewo.nlu.auth.KeycloakCredentials credentials = config.keycloakCredentials().get();
+        assertEquals("pw-1", credentials.getPassword());
+        assertEquals(600, credentials.getTokenExpirationInS());
+        assertFalse(credentials.isVerifySsl());
+    }
+
+    @Test
+    void t56T60ATokenOnlyConfigIsValidAndCarriesTheTokenWithAnEmptyPassword() {
+        final ClientConfig config = keycloak().refreshToken("off-handed-0").build();
+        assertTrue(config.isKeycloakConfigured());
+        final com.ondewo.nlu.auth.KeycloakCredentials credentials = config.keycloakCredentials().get();
+        assertEquals("off-handed-0", credentials.getRefreshToken());
+        assertEquals("", credentials.getPassword());
+        assertTrue(credentials.isVerifySsl());
+        assertEquals(null, credentials.getTokenExpirationInS());
+    }
+
+    @Test
+    void t57TheTripleWithNeitherPasswordNorTokenIsRefused() {
+        final IllegalArgumentException raised =
+                assertThrows(IllegalArgumentException.class, () -> keycloak().password(null).refreshToken(null).build());
+        assertEquals(
+                "Either the field `password` or the field `refresh_token` is mandatory in ClientConfig.",
+                raised.getMessage());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"u,'',''", "'',r,''", "'','',c", "u,r,''", "u,'',c", "'',r,c"})
+    void t61APartialTripleIsRefusedNamingTheThreeFields(final String url, final String realm, final String clientId) {
+        final IllegalArgumentException raised =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> base().keycloakUrl(url).realm(realm).clientId(clientId).password("p").build());
+        assertEquals(
+                "The Keycloak fields `keycloak_url`, `realm`, and `client_id` must be provided together"
+                        + " in ClientConfig.",
+                raised.getMessage());
+    }
+
+    @Test
+    void v3ANonKeycloakConfigNeedsNoCredential() {
+        assertFalse(base().build().isKeycloakConfigured());
+    }
+
+    @Test
+    void t59RenderingRedactsThePasswordAndTheRefreshToken() {
+        final String rendered =
+                keycloak().password("pw-never-logged-5d1c").refreshToken("off-secret-1").build().toString();
+        assertFalse(rendered.contains("pw-never-logged-5d1c"), rendered);
+        assertFalse(rendered.contains("off-secret-1"), rendered);
+        assertTrue(rendered.contains("password=" + ClientConfig.REDACTED), rendered);
+        assertTrue(rendered.contains("refreshToken=" + ClientConfig.REDACTED + "}"), rendered);
+        assertTrue(rendered.contains("keycloakUrl=https://keycloak.example/auth"), rendered);
+
+        final String tokenOnly = keycloak().refreshToken("off-secret-1").build().toString();
+        assertTrue(tokenOnly.contains("password=, "), tokenOnly);
+    }
+
+    @Test
+    void t55TheBuilderHasNoPositionalSurfaceAndAcceptsTheFieldsInAnyOrder() {
+        final ClientConfig config =
+                base().refreshToken("off-1").clientId("c").username("u").realm("r").keycloakUrl("k").build();
+        assertEquals("off-1", config.keycloakCredentials().get().getRefreshToken());
+    }
+
+    // endregion
 }

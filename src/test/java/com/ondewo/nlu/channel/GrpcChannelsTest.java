@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.ondewo.nlu.auth.KeycloakAuthenticationException;
+import com.ondewo.nlu.auth.KeycloakCredentials;
+import com.ondewo.nlu.auth.TestProviders;
+
 import io.grpc.CallOptions;
 import io.grpc.ChannelCredentials;
 import io.grpc.Grpc;
@@ -77,6 +81,7 @@ class GrpcChannelsTest {
 
     private final List<ManagedChannel> channels = new ArrayList<>();
     private final AtomicReference<String> clientSubject = new AtomicReference<>();
+    private final AtomicReference<String> authorization = new AtomicReference<>();
     private Server server;
 
     @BeforeAll
@@ -134,6 +139,10 @@ class GrpcChannelsTest {
                         clientSubject.set(
                                 peerSubject(
                                         call.getAttributes().get(Grpc.TRANSPORT_ATTR_SSL_SESSION)));
+                        authorization.set(
+                                headers.get(
+                                        Metadata.Key.of(
+                                                "authorization", Metadata.ASCII_STRING_MARSHALLER)));
                         return next.startCall(call, headers);
                     }
                 };
@@ -309,6 +318,74 @@ class GrpcChannelsTest {
         assertEquals(1, records.size());
         assertEquals(Level.WARNING, records.get(0).getLevel());
         assertEquals("localhost:" + port, records.get(0).getParameters()[0]);
+    }
+
+    @Test
+    void aKeycloakConfigAuthenticatesEveryCallWithTheSharedProviderOfItsCredentials()
+            throws Exception {
+        final int port =
+                startServer(tlsServer(ClientAuth.NONE, pki.server.certPem, pki.server.keyPem));
+        final List<KeycloakCredentials> looked = new ArrayList<>();
+        final ClientConfig config =
+                client(port).grpcCert(pki.ca.certPem)
+                        .keycloakUrl("https://keycloak.example/auth")
+                        .realm("ondewo-test-realm")
+                        .clientId("ondewo-nlu-cai-sdk-public")
+                        .username("technical-user@example.com")
+                        .refreshToken("off-handed-0")
+                        .build();
+        final ManagedChannel channel =
+                GrpcChannels.newChannelBuilder(
+                                config,
+                                credentials -> {
+                                    looked.add(credentials);
+                                    return TestProviders.serving(credentials, "acc-1");
+                                })
+                        .build();
+        channels.add(channel);
+
+        ClientCalls.blockingUnaryCall(channel, ECHO, CallOptions.DEFAULT, bytes("ping"));
+
+        assertEquals("Bearer acc-1", authorization.get());
+        assertEquals(1, looked.size());
+        assertEquals("off-handed-0", looked.get(0).getRefreshToken());
+        assertEquals("", looked.get(0).getPassword());
+    }
+
+    @Test
+    void t62WithoutKeycloakNoProviderIsLookedUpAndNoAuthorizationIsSent() throws Exception {
+        final int port =
+                startServer(tlsServer(ClientAuth.NONE, pki.server.certPem, pki.server.keyPem));
+        final ManagedChannel channel =
+                GrpcChannels.newChannelBuilder(
+                                client(port).grpcCert(pki.ca.certPem).password("p").build(),
+                                credentials -> {
+                                    throw new AssertionError("a provider was looked up");
+                                })
+                        .build();
+        channels.add(channel);
+
+        ClientCalls.blockingUnaryCall(channel, ECHO, CallOptions.DEFAULT, bytes("ping"));
+
+        assertNull(authorization.get());
+    }
+
+    @Test
+    void aFailingStartUpLoginSurfacesFromNewChannel() {
+        final KeycloakAuthenticationException raised =
+                assertThrows(
+                        KeycloakAuthenticationException.class,
+                        () ->
+                                GrpcChannels.newChannel(
+                                        client(50051)
+                                                .keycloakUrl("http://127.0.0.1:1/auth")
+                                                .realm("r")
+                                                .clientId("c")
+                                                .username("u")
+                                                .password("pw-never-logged-5d1c")
+                                                .build()));
+        assertTrue(raised.getMessage().contains("could not reach the token endpoint"));
+        assertFalse(raised.getMessage().contains("pw-never-logged-5d1c"));
     }
 
     // endregion
